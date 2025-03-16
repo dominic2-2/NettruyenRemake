@@ -158,7 +158,7 @@ namespace NettruyenRemake.Controllers
                     HttpContext.Session.Remove("SecurityCode");
                     HttpContext.Session.Remove("SecurityCodeCreatedAt");
 
-                    return RedirectToAction("login");
+                    return RedirectToAction("Login");
                 }
                 catch (Exception ex)
                 {
