@@ -1,0 +1,61 @@
+﻿@model NettruyenRemake.Models.User
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Tailwind CSS and Material Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/styles/material-tailwind.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/scripts/script.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen m-0">
+    <!-- Form Section -->
+    <main class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+        <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+            <h3 class="text-2xl font-bold text-gray-900 text-center mb-6">Register</h3>
+            <form method="post" asp-controller="account" asp-action="save" class="space-y-6">
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" asp-for="Username" id="username"
+                           class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+           focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           placeholder="Enter your username" required>
+                    <span asp-validation-for="Username" class="text-red-500 text-sm"></span>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" asp-for="Email" id="email"
+                           class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           placeholder="Enter your email" required>
+                    <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password_hash" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" asp-for="PasswordHash" id="password_hash"
+                           class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                        focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           placeholder="Enter your password" required>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm
+                        text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none
+                        focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Register
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
