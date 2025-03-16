@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using NettruyenRemake.Models;
+
 namespace NettruyenRemake
 {
     public class Program
@@ -9,6 +12,9 @@ namespace NettruyenRemake
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSession();
+
+            builder.Services.AddDbContext<NettruyenDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 
             var app = builder.Build();
             app.UseSession();
