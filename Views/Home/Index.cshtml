@@ -1,20 +1,435 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Web Truyện Tranh</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Đảm bảo chỉ hiển thị 4 truyện trên màn hình */
+        .carousel {
+            display: flex;
+            scroll-snap-type: x mandatory;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
 
-<section class="m-10">
-    <div class="p-10 rounded-l-xl border border-blue-gray-100 bg-[url('/img/gradient-bg.png')] rounded-xl bg-no-repeat lg:bg-contain bg-cover bg-right">
-        <p class="font-bold mb-2 text-blue-gray-700 text-sm">
-            Upcoming Events
-        </p>
-        <h3 class="text-2xl font-semibold text-blue-gray-900">
-            Tech Summit: Shaping Tomorrow
-        </h3>
-        <p class="mt-2 mb-6 text-gray-500 text-base font-normal">
-            Prepare to be part of dynamic conversations that will redefine the boundaries.
-        </p>
-        <button class="px-6 py-3 border border-gray-800 text-gray-800 font-medium rounded-lg hover:bg-gray-800 hover:text-white transition-all">
-            Join Now
-        </button>
-    </div>
-</section>
+            .carousel::-webkit-scrollbar {
+                display: none; /* Ẩn thanh cuộn trên Chrome, Safari */
+            }
+
+        .snap-center {
+            scroll-snap-align: center;
+        }
+        
+
+        }
+    </style>
+</head>
+<body class="bg-white text-black">
+    <!-- Featured Section (Carousel) -->
+    <section class="py-10 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-black">Truyện Tranh Nổi Bật</h2>
+                <a href="#" class="text-indigo-600 hover:underline">Xem tất cả</a>
+            </div>
+            <div class="relative">
+                <div class="carousel flex overflow-x-hidden space-x-6 snap-x snap-mandatory" id="featuredCarousel">
+                    <!-- Item 1 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://jumpg-assets.tokyo-cdn.com/secure/title/1000001/title_thumbnail_portrait_list/326475.jpg?hash=2FR6gxRFLFRRIEykVugGyw&expires=2145884400" alt="One Piece" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">One Piece</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Eiichiro Oda</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 1085: The World in Shambles</a>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://naruto-official.com/anime/series/naruto2_visual.webp" alt="Naruto" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Naruto</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Masashi Kishimoto</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 700: The Final Battle</a>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://inkofblood.com/wp-content/uploads/2024/02/demon-slayer-kimetsu-no-yaiba-to-the-hashira-training.jpg" alt="Demon Slayer" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Demon Slayer</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Koyoharu Gotouge</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 205: The Dawn of a New Era</a>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://api-website.cinestar.com.vn/media/wysiwyg/Screenshot_2025-01-13_at_3.48.02_PM.png" alt="Attack on Titan" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Attack on Titan</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Hajime Isayama</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 139: Toward the Tree on That Hill</a>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://cdn0.fahasa.com/media/catalog/product/9/7/9784088837444.jpg" alt="Dragon Ball" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Dragon Ball</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Akira Toriyama</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 519: Farewell, Dragon World!</a>
+                        </div>
+                    </div>
+                    <!-- Item 6 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/7/72/Bleachanime.png" alt="Bleach" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Bleach</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Tite Kubo</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 686: The End</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-300 bg-opacity-50 text-black p-3 rounded-full hover:bg-opacity-75 transition-opacity" onclick="scrollCarousel('featuredCarousel', -1)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-300 bg-opacity-50 text-black p-3 rounded-full hover:bg-opacity-75 transition-opacity" onclick="scrollCarousel('featuredCarousel', 1)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Section (Table) -->
+    <section class="py-10 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-black">Bảng Xếp Hạng Truyện Tranh Hot</h2>
+                <div class="flex items-center space-x-2">
+                    <select class="bg-gray-200 text-black rounded-lg p-2">
+                        <option>24h</option>
+                        <option>7 ngày</option>
+                        <option>30 ngày</option>
+                    </select>
+                    <a href="#" class="text-indigo-600 hover:underline">Xem tất cả</a>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-gray-600">
+                            <th class="py-3 px-4">Top</th>
+                            <th class="py-3 px-4">Truyện</th>
+                            <th class="py-3 px-4">Thể loại</th>
+                            <th class="py-3 px-4">Lượt xem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t border-gray-300">
+                            <td class="py-3 px-4 text-black">1</td>
+                            <td class="py-3 px-4 flex items-center space-x-2">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc-iQQykNOYqYaTDZvhrir9LEWGT8Ac2fkxA&s" alt="One Punch Man" class="w-10 h-10 rounded-full">
+                                <span class="text-black">One Punch Man</span>
+                            </td>
+                            <td class="py-3 px-4 text-black">Hành Động</td>
+                            <td class="py-3 px-4 text-black">1,995K</td>
+                        </tr>
+                        <tr class="border-t border-gray-300">
+                            <td class="py-3 px-4 text-black">2</td>
+                            <td class="py-3 px-4 flex items-center space-x-2">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc-iQQykNOYqYaTDZvhrir9LEWGT8Ac2fkxA&s" alt="Attack on Titan" class="w-10 h-10 rounded-full">
+                                <span class="text-black">Attack on Titan</span>
+                            </td>
+                            <td class="py-3 px-4 text-black">Kinh Dị</td>
+                            <td class="py-3 px-4 text-black">1,201K</td>
+                        </tr>
+                        <tr class="border-t border-gray-300">
+                            <td class="py-3 px-4 text-black">3</td>
+                            <td class="py-3 px-4 flex items-center space-x-2">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc-iQQykNOYqYaTDZvhrir9LEWGT8Ac2fkxA&s" alt="My Hero Academia" class="w-10 h-10 rounded-full">
+                                <span class="text-black">My Hero Academia</span>
+                            </td>
+                            <td class="py-3 px-4 text-black">Siêu Anh Hùng</td>
+                            <td class="py-3 px-4 text-black">862K</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Section (Carousel) -->
+    <section class="py-10 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-black">Truyện Tranh Phổ Biến </h2>
+                <a href="#" class="text-indigo-600 hover:underline">Xem tất cả</a>
+            </div>
+            <div class="relative">
+                <div class="carousel flex overflow-x-hidden space-x-6 snap-x snap-mandatory" id="featuredCarousel">
+                    <!-- Item 1 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://jumpg-assets.tokyo-cdn.com/secure/title/1000001/title_thumbnail_portrait_list/326475.jpg?hash=2FR6gxRFLFRRIEykVugGyw&expires=2145884400" alt="One Piece" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">One Piece</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Eiichiro Oda</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 1085: The World in Shambles</a>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://naruto-official.com/anime/series/naruto2_visual.webp" alt="Naruto" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Naruto</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Masashi Kishimoto</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 700: The Final Battle</a>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://inkofblood.com/wp-content/uploads/2024/02/demon-slayer-kimetsu-no-yaiba-to-the-hashira-training.jpg" alt="Demon Slayer" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Demon Slayer</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Koyoharu Gotouge</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 205: The Dawn of a New Era</a>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://api-website.cinestar.com.vn/media/wysiwyg/Screenshot_2025-01-13_at_3.48.02_PM.png" alt="Attack on Titan" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Attack on Titan</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Hajime Isayama</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 139: Toward the Tree on That Hill</a>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://cdn0.fahasa.com/media/catalog/product/9/7/9784088837444.jpg" alt="Dragon Ball" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Dragon Ball</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Akira Toriyama</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 519: Farewell, Dragon World!</a>
+                        </div>
+                    </div>
+                    <!-- Item 6 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/7/72/Bleachanime.png" alt="Bleach" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Bleach</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Tite Kubo</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 686: The End</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-300 bg-opacity-50 text-black p-3 rounded-full hover:bg-opacity-75 transition-opacity" onclick="scrollCarousel('featuredCarousel', -1)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-300 bg-opacity-50 text-black p-3 rounded-full hover:bg-opacity-75 transition-opacity" onclick="scrollCarousel('featuredCarousel', 1)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Discover Section (Carousel) -->
+    <section class="py-10 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-black">Khám Phá Truyện Tranh Mới</h2>
+                <a href="#" class="text-indigo-600 hover:underline">Xem tất cả</a>
+            </div>
+            <div class="relative">
+                <div class="carousel flex overflow-x-hidden space-x-6 snap-x snap-mandatory" id="featuredCarousel">
+                    <!-- Item 1 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://jumpg-assets.tokyo-cdn.com/secure/title/1000001/title_thumbnail_portrait_list/326475.jpg?hash=2FR6gxRFLFRRIEykVugGyw&expires=2145884400" alt="One Piece" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">One Piece</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Eiichiro Oda</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 1085: The World in Shambles</a>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://naruto-official.com/anime/series/naruto2_visual.webp" alt="Naruto" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Naruto</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Masashi Kishimoto</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 700: The Final Battle</a>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://inkofblood.com/wp-content/uploads/2024/02/demon-slayer-kimetsu-no-yaiba-to-the-hashira-training.jpg" alt="Demon Slayer" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Demon Slayer</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Koyoharu Gotouge</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 205: The Dawn of a New Era</a>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://api-website.cinestar.com.vn/media/wysiwyg/Screenshot_2025-01-13_at_3.48.02_PM.png" alt="Attack on Titan" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Attack on Titan</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Hajime Isayama</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 139: Toward the Tree on That Hill</a>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://cdn0.fahasa.com/media/catalog/product/9/7/9784088837444.jpg" alt="Dragon Ball" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Dragon Ball</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Akira Toriyama</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 519: Farewell, Dragon World!</a>
+                        </div>
+                    </div>
+                    <!-- Item 6 -->
+                    <div class="bg-gray-200 rounded-xl shadow-lg overflow-hidden flex-none w-64 snap-center transform transition duration-300 hover:scale-105 hover:shadow-xl border border-gray-300">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/7/72/Bleachanime.png" alt="Bleach" class="w-full h-96 object-cover" style="aspect-ratio: 3/4;" loading="lazy">
+                        <div class="p-4 bg-gradient-to-t from-gray-200 to-transparent pb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-gray-500 text-sm">🔥</span>
+                                <h3 class="text-lg font-bold text-black line-clamp-1">Bleach</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2 line-clamp-1">Tác giả: Tite Kubo</p>
+                            <a href="#" class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">Chương 686: The End</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-300 bg-opacity-50 text-black p-3 rounded-full hover:bg-opacity-75 transition-opacity" onclick="scrollCarousel('featuredCarousel', -1)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-300 bg-opacity-50 text-black p-3 rounded-full hover:bg-opacity-75 transition-opacity" onclick="scrollCarousel('featuredCarousel', 1)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript for Carousel -->
+    <script>
+        function scrollCarousel(carouselId, direction) {
+            const carousel = document.getElementById(carouselId);
+            const itemWidth = carousel.querySelector('div').offsetWidth + 24; // 24 là space-x-6
+            const itemsPerView = 4; // Số mục hiển thị trên màn hình
+            const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+
+            let currentScroll = carousel.scrollLeft;
+            let scrollAmount = currentScroll + (direction * itemWidth * itemsPerView);
+
+            // Nếu cuộn tới cuối (hướng phải), quay lại đầu
+            if (scrollAmount > maxScroll) {
+                scrollAmount = 0; // Quay lại đầu carousel
+            }
+            // Nếu cuộn tới đầu (hướng trái), chuyển tới cuối
+            else if (scrollAmount < 0) {
+                scrollAmount = maxScroll; // Chuyển tới cuối carousel
+            }
+
+            carousel.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+
+    <!-- JavaScript for Carousel -->
+    <script>
+        function scrollCarousel(carouselId, direction) {
+            const carousel = document.getElementById(carouselId);
+            if (!carousel) return; // Kiểm tra nếu carousel không tồn tại
+
+            const itemWidth = carousel.querySelector('div').offsetWidth + 24; // 24 là space-x-6
+            const itemsPerView = 4; // Số mục hiển thị trên màn hình
+            const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+
+            let currentScroll = carousel.scrollLeft;
+            // Đảo ngược direction: direction * -1
+            let scrollAmount = currentScroll + (direction * -1 * itemWidth * itemsPerView);
+
+            // Nếu cuộn tới cuối (hướng phải), quay lại đầu
+            if (scrollAmount > maxScroll) {
+                scrollAmount = 0; // Quay lại đầu carousel
+            }
+            // Nếu cuộn tới đầu (hướng trái), chuyển tới cuối
+            else if (scrollAmount < 0) {
+                scrollAmount = maxScroll; // Chuyển tới cuối carousel
+            }
+
+            carousel.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+    }
+</body>
+</html>
