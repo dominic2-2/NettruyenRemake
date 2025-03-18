@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using NettruyenRemake.Models;
+
 namespace NettruyenRemake
 {
     public class Program
@@ -5,6 +8,8 @@ namespace NettruyenRemake
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<NettruyenDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
