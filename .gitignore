@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/package-lock.json
+/package.json
+/.gitignore
+/Views/Shared/_Layout.cshtml
