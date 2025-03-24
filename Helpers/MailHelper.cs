@@ -20,8 +20,11 @@ namespace NettruyenRemake.Helpers
                 var host = _configuration["Gmail:Host"];
                 var port = int.Parse(_configuration["Gmail:Port"]);
                 var username = _configuration["Gmail:Username"];
-                var password = _configuration["Gmail:Password"];
                 var enableSsl = bool.Parse(_configuration["Gmail:EnableSsl"]);
+
+                // Lấy password từ biến môi trường thay vì appsettings
+                var password = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+
                 var smtpClient = new SmtpClient
                 {
                     Host = host,
@@ -29,9 +32,13 @@ namespace NettruyenRemake.Helpers
                     EnableSsl = enableSsl,
                     Credentials = new NetworkCredential(username, password)
                 };
-                var mailMessage = new MailMessage(from, to);
-                mailMessage.Subject = subject;
-                mailMessage.Body = body;
+
+                var mailMessage = new MailMessage(from, to)
+                {
+                    Subject = subject,
+                    Body = body
+                };
+
                 smtpClient.Send(mailMessage);
                 return true;
             }
@@ -40,5 +47,6 @@ namespace NettruyenRemake.Helpers
                 return false;
             }
         }
+
     }
 }

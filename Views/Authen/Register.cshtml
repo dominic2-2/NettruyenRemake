@@ -1,4 +1,7 @@
 ﻿@model NettruyenRemake.Models.User
+@{
+    Layout = null;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +18,7 @@
     <main class="flex items-center justify-center min-h-[calc(100vh-4rem)]">
         <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
             <h3 class="text-2xl font-bold text-gray-900 text-center mb-6">Register</h3>
-            <form method="post" asp-controller="account" asp-action="save" class="space-y-6">
+            <form method="post" asp-controller="Authen" asp-action="Save" class="space-y-6">
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700">Username</label>

@@ -8,13 +8,14 @@ namespace NettruyenRemake
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<NettruyenDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Configuration.AddEnvironmentVariables();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<NettruyenDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("NettruyenDB")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
