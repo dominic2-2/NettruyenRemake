@@ -37,8 +37,8 @@
                 <div class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 w-full mx-auto p-4">
                     <div class="mb-2 flex items-center gap-4">
                         <img src="https://www.material-tailwind.com/logos/mt-logo.png"
-                        alt="brand"
-                        class="h-9 w-9" />
+                             alt="brand"
+                             class="h-9 w-9" />
                         <p class="block antialiased font-sans text-base leading-relaxed text-blue-gray-900 text-lg font-bold">
                             Nettruyen
                         </p>
@@ -47,57 +47,62 @@
                         <div class="block relative w-full">
                             @if (!string.IsNullOrEmpty(userName))
                             {
-                            <div data-selected="false"
-                            role="button"
-                            data-ripple-dark="true"
-                            tabindex="0"
-                            class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none p-3 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                                <div class="grid place-items-center mr-4">
-                                    @if (!string.IsNullOrEmpty(userAvatar))
-                                    {
-                                        <img src="@userAvatar"
-                                        class="inline-block relative object-cover object-center !rounded-full w-9 h-9 rounded-md" />
-                                    }
+                                <div data-selected="false"
+                                     role="button"
+                                     data-ripple-dark="true"
+                                     tabindex="0"
+                                     class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none p-3 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                    <div class="grid place-items-center mr-4">
+                                        @if (!string.IsNullOrEmpty(userAvatar))
+                                        {
+                                            <img src="@userAvatar"
+                                                 class="inline-block relative object-cover object-center !rounded-full w-9 h-9 rounded-md" />
+                                        }
 
 
+                                    </div>
+                                    <p class="block antialiased font-sans text-base font-light leading-relaxed text-inherit mr-auto font-normal text-inherit">
+                                        @userName
+                                    </p>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke-width="3"
+                                         stroke="currentColor"
+                                         aria-hidden="true"
+                                         data-slot="icon"
+                                         class="ml-auto h-4 w-4 text-gray-500 transition-transform">
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
+                                    </svg>
                                 </div>
-                                <p class="block antialiased font-sans text-base font-light leading-relaxed text-inherit mr-auto font-normal text-inherit">
-                                    @userName
-                                </p>
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="3"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                                data-slot="icon"
-                                class="ml-auto h-4 w-4 text-gray-500 transition-transform">
-                                    <path stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
-                                </svg>
-                            </div>
-                            
+
                                 <div class="overflow-hidden" style="height: 0px">
-                                <div class="block w-full py-4 text-gray-700 antialiased font-sans text-sm font-light leading-normal py-1">
-                                    <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700 p-0">
-                                        <div role="button"
-                                             data-ripple-dark="true"
-                                             tabindex="0"
-                                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                                            My Profile
-                                        </div>
-                                        <div role="button"
-                                             data-ripple-dark="true"
-                                             tabindex="0"
-                                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                                            Settings
-                                        </div>
-                                    </nav>
+                                    <div class="block w-full py-4 text-gray-700 antialiased font-sans text-sm font-light leading-normal py-1">
+                                        <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700 p-0">
+                                            <div role="button"
+                                                 data-ripple-dark="true"
+                                                 tabindex="0"
+                                                 class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                                My Profile
+                                            </div>
+                                            <a href="@Url.Action("MyFollowings", "Comic")"
+                                               class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                                <i class="fas fa-heart mr-2 text-pink-500"></i>
+                                                My Follows
+                                            </a>
+                                            <div role="button"
+                                                 data-ripple-dark="true"
+                                                 tabindex="0"
+                                                 class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                                Settings
+                                            </div>
+                                        </nav>
+                                    </div>
                                 </div>
-                            </div>
                             }
-                            
+
                         </div>
                         <hr class="my-2 border-gray-200" />
                         <div class="block relative w-full">
@@ -164,8 +169,9 @@
                                      aria-hidden="true"
                                      data-slot="icon"
                                      class="h-5 w-5">
-                                    <path d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"></path>
-                                    <path d="M18 7.5a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-7.5a3 3 0 0 1-3-3v-7.5a3 3 0 0 1 3-3H18Z"></path>
+                                    <path d="M16.5 6a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z"
+                                          clip-rule="evenodd"></path>
+                                    <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z"></path>
                                 </svg>
                             </div>
                             Products
@@ -207,6 +213,46 @@
                             </div>
                             Customers
                         </div>
+                        <div role="button"
+                             data-ripple-dark="true"
+                             tabindex="0"
+                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                            <div class="grid place-items-center mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 24 24"
+                                     fill="currentColor"
+                                     aria-hidden="true"
+                                     data-slot="icon"
+                                     class="h-5 w-5">
+                                    <path fill-rule="evenodd"
+                                          d="M3.25 12a8.75 8.75 0 0 1 17.5 0 8.75 8.75 0 0 1-17.5 0ZM12 1.25C6.06 1.25 1.25 6.06 1.25 12S6.06 22.75 12 22.75 22.75 17.94 22.75 12 17.94 1.25 12 1.25Zm0 8a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
+                                          clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <a href="@Url.Action("ListAll", "Comic")" class="block w-full">Comics</a>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Context.Session.GetString("UserName")))
+                        {
+                            <div class="block relative w-full">
+                                <div data-selected="false"
+                                     role="button"
+                                     data-ripple-dark="true"
+                                     tabindex="0"
+                                     class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-3 py-[9px] select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                    <div class="grid place-items-center mr-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 24 24"
+                                             fill="currentColor"
+                                             aria-hidden="true"
+                                             data-slot="icon"
+                                             class="h-5 w-5">
+                                            <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+                                        </svg>
+                                    </div>
+                                    <a href="@Url.Action("MyFollowings", "Comic")" class="block w-full">My Follows</a>
+                                </div>
+                            </div>
+                        }
                     </nav>
                     <hr class="my-2 border-gray-200" />
                     <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
@@ -255,44 +301,47 @@
 
         <!-- Main -->
         <div id="main-content" class="flex-1 transition-all duration-300 mt-1">
-            <header class="flex">
-                <button id="toggle-sidebar" class="p-2 rounded-lg hover:bg-gray-200 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         viewBox="0 0 24 24"
-                         fill="currentColor"
-                         class="h-6 w-6 text-gray-900">
-                        <path fill-rule="evenodd"
-                              d="M3 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 5.25zm0 4.5A.75.75 0 013.75 9h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 9.75zm0 4.5a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zm0 4.5a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
-                              clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-                <nav aria-label="breadcrumb" class="w-max ml-4">
-                    <ol class="flex w-full flex-wrap items-center rounded-md px-4 py-2">
-                        <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
-                            <a href="">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     class="h-4 w-4"
-                                     viewBox="0 0 20 20"
-                                     fill="currentColor">
-                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                </svg>
-                            </a>
-                            <span class="pointer-events-none mx-2 text-slate-800">
-                                /
-                            </span>
-                        </li>
-                        <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
-                            <a href="#">Components</a>
-                            <span class="pointer-events-none mx-2 text-slate-800">
-                                /
-                            </span>
-                        </li>
-                        <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
-                            <a href="#">Breadcrumbs</a>
-                        </li>
-                    </ol>
-                </nav>
-                <div class="w-full ml-auto max-w-sm min-w-[200px] mr-1">
+            <header class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <button id="toggle-sidebar" class="p-2 rounded-lg hover:bg-gray-200 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             fill="currentColor"
+                             class="h-6 w-6 text-gray-900">
+                            <path fill-rule="evenodd"
+                                  d="M3 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 5.25zm0 4.5A.75.75 0 013.75 9h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 9.75zm0 4.5a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75zm0 4.5a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
+                                  clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                    <nav aria-label="breadcrumb" class="w-max ml-4">
+                        <ol class="flex w-full flex-wrap items-center rounded-md px-4 py-2">
+                            <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
+                                <a href="">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-4 w-4"
+                                         viewBox="0 0 20 20"
+                                         fill="currentColor">
+                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                                    </svg>
+                                </a>
+                                <span class="pointer-events-none mx-2 text-slate-800">
+                                    /
+                                </span>
+                            </li>
+                            <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
+                                <a href="#">Components</a>
+                                <span class="pointer-events-none mx-2 text-slate-800">
+                                    /
+                                </span>
+                            </li>
+                            <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
+                                <a href="#">Breadcrumbs</a>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <div class="flex items-center space-x-4">
                     <div class="relative flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600">
                             <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
@@ -301,8 +350,7 @@
                         <input class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                                placeholder="UI Kits, Dashboards..." />
                     </div>
-                </div>
-                <div class="ml-4">
+
                     @if (string.IsNullOrEmpty(userName))
                     {
                         <a href="/Authen/Login"
@@ -310,7 +358,6 @@
                             Login
                         </a>
                     }
-                    
                 </div>
             </header>
 

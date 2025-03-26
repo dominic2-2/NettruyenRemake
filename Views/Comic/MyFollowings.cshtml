@@ -1,0 +1,229 @@
+﻿@model IEnumerable<NettruyenRemake.Models.Comic>
+
+@{
+    ViewData["Title"] = "My Followed Comics";
+
+    // Check if user is logged in using session
+    var userId = Context.Session.GetInt32("UserId");
+    bool isLoggedIn = userId.HasValue && userId.Value > 0;
+
+    // Layout = null; No layout
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Followed Comics</title>
+    <!-- Tailwind CSS and Material Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/styles/material-tailwind.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/scripts/script.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">My Followed Comics</h1>
+            <a href="@Url.Action("ListAll", "Comic")"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-book-open mr-2"></i> Browse All Comics
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                <div class="text-gray-500 mb-4">
+                    <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
+                    <h2 class="text-2xl font-bold text-gray-700 mb-2">You're not following any comics yet</h2>
+                    <p class="text-gray-500 mb-6">Explore our collection and follow comics you enjoy to see them here.</p>
+                    <a href="@Url.Action("ListAll", "Comic")"
+                       class="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors">
+                        Browse Comics
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div id="comics-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var comic in Model)
+                {
+                    <div class="comic-card bg-white rounded-lg shadow-lg overflow-hidden">
+                        <!-- Comic Image -->
+                        <div class="relative overflow-hidden h-64">
+                            <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
+                                <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "/images/default-comic.jpg" : comic.ThumbnailUrl)"
+                                     class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" alt="@comic.Title">
+                            </a>
+                            <div class="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                @comic.Status.StatusName
+                            </div>
+                        </div>
+
+                        <!-- Comic Info -->
+                        <div class="p-4">
+                            <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })" class="block">
+                                <h3 class="text-lg font-bold text-gray-900 line-clamp-2 mb-2 hover:text-indigo-600 transition-colors">@comic.Title</h3>
+                            </a>
+
+                            <!-- Author -->
+                            <p class="text-gray-700 text-sm mb-2">
+                                <i class="fas fa-user-edit mr-1 text-gray-500"></i>
+                                @(string.IsNullOrEmpty(comic.Author) ? "Unknown" : comic.Author)
+                            </p>
+
+                            <!-- Comic Stats -->
+                            <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
+                                <div class="flex space-x-3">
+                                    <!-- Views -->
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-eye mr-1"></i>
+                                        <span>@(comic.ComicStat?.ViewCount?.ToString("N0") ?? "0")</span>
+                                    </span>
+
+                                    <!-- Follows -->
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-heart mr-1 text-pink-500"></i>
+                                        <span>@(comic.ComicStat?.FollowCount?.ToString("N0") ?? "0")</span>
+                                    </span>
+
+                                    <!-- Comments -->
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-comment mr-1"></i>
+                                        <span>@(comic.ComicStat?.CommentCount?.ToString("N0") ?? "0")</span>
+                                    </span>
+
+                                    <!-- Rating -->
+                                    <span class="inline-flex items-center text-yellow-500">
+                                        <i class="fas fa-star mr-1"></i>
+                                        <span>@(ViewBag.ComicRatings != null && ViewBag.ComicRatings.ContainsKey(comic.ComicId) ? ViewBag.ComicRatings[comic.ComicId] : "0")</span>
+                                    </span>
+                                </div>
+
+                                <!-- Status badge remains the same -->
+                                <span class="px-2 py-1 rounded-full text-xs font-medium @(comic.Status.StatusName == "Completed" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800")">
+                                    @comic.Status.StatusName
+                                </span>
+                            </div>
+
+                            <!-- Latest Chapters -->
+                            <div class="border-t border-gray-100 pt-3">
+                                <p class="text-xs text-gray-500 mb-2">Latest chapters:</p>
+                                @{
+                                    var latestChapters = comic.Chapters.OrderByDescending(c => c.ChapterNumber).Take(3).ToList();
+                                }
+
+                                @if (latestChapters.Any())
+                                {
+                                    <div class="space-y-1">
+                                        @foreach (var chapter in latestChapters)
+                                        {
+                                            string timeText = "";
+                                            if (chapter.CreatedAt.HasValue)
+                                            {
+                                                var timeAgo = DateTime.Now - chapter.CreatedAt.Value;
+                                                if (timeAgo.TotalDays < 1)
+                                                    timeText = "Today";
+                                                else if (timeAgo.TotalDays < 2)
+                                                    timeText = "Yesterday";
+                                                else
+                                                    timeText = $"{(int)timeAgo.TotalDays} days ago";
+                                            }
+
+                                            <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })"
+                                               class="flex justify-between items-center text-sm hover:bg-gray-50 p-1 rounded">
+                                                <span class="text-indigo-600">
+                                                    Chapter @chapter.ChapterNumber
+                                                </span>
+
+                                                <span class="text-gray-500 text-sm">@timeText</span>
+                                            </a>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-gray-500 text-center py-2">No chapters yet</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="px-4 pb-4">
+                            <button class="follow-toggle-btn w-full py-2 rounded-md text-center bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
+                                    data-comic-id="@comic.ComicId">
+                                <i class="fas fa-heart mr-2"></i> Unfollow
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Empty state template to show when all comics are removed -->
+    <template id="empty-state-template">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div class="text-gray-500 mb-4">
+                <i class="fas fa-heart text-6xl text-gray-300 mb-4"></i>
+                <h2 class="text-2xl font-bold text-gray-700 mb-2">You're not following any comics yet</h2>
+                <p class="text-gray-500 mb-6">Explore our collection and follow comics you enjoy to see them here.</p>
+                <a href="@Url.Action("ListAll", "Comic")"
+                   class="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors">
+                    Browse Comics
+                </a>
+            </div>
+        </div>
+    </template>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-inner mt-8 py-6">
+        <div class="container mx-auto px-4">
+            <div class="text-center text-gray-500">
+                <p>&copy; @DateTime.Now.Year - NettruyenRemake - Comic Reading Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.follow-toggle-btn').click(function() {
+                var btn = $(this);
+                var comicId = btn.data('comic-id');
+                var card = btn.closest('.comic-card');
+
+                $.ajax({
+                    url: '@Url.Action("ToggleFollow", "Comic")',
+                    type: 'POST',
+                    data: { comicId: comicId },
+                    success: function(response) {
+                        if (response.success && !response.following) {
+                            // If unfollowed, remove the comic card from the page with animation
+                            card.fadeOut(300, function() {
+                                card.remove();
+
+                                // Check if there are any comics left
+                                if ($('.comic-card').length === 0) {
+                                    // If no more comics, show empty state
+                                    var emptyState = $('#empty-state-template').html();
+                                    $('#comics-container').replaceWith(emptyState);
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        console.log("Response:", xhr.responseText);
+                        alert('Failed to unfollow comic. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
