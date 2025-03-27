@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NettruyenRemake.Helpers;
 using NettruyenRemake.Models;
 
 namespace NettruyenRemake.Controllers
@@ -25,139 +28,281 @@ namespace NettruyenRemake.Controllers
             return View(await nettruyenDbContext.ToListAsync());
         }
 
-        // GET: ManageComics/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comic = await _context.Comics
-                .Include(c => c.Status)
-                .FirstOrDefaultAsync(m => m.ComicId == id);
-            if (comic == null)
-            {
-                return NotFound();
-            }
-
-            return View(comic);
-        }
-
         // GET: ManageComics/Create
         public IActionResult Create()
         {
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId");
             return View();
         }
 
-        // POST: ManageComics/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ComicId,Title,Description,Author,StatusId,ThumbnailUrl,CreatedAt,UpdatedAt")] Comic comic)
+        public async Task<JsonResult> FetchMetadata(string site, string url)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(comic);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId", comic.StatusId);
-            return View(comic);
-        }
-
-        // GET: ManageComics/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comic = await _context.Comics.FindAsync(id);
-            if (comic == null)
-            {
-                return NotFound();
-            }
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId", comic.StatusId);
-            return View(comic);
-        }
-
-        // POST: ManageComics/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ComicId,Title,Description,Author,StatusId,ThumbnailUrl,CreatedAt,UpdatedAt")] Comic comic)
-        {
-            if (id != comic.ComicId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
+            if (site == "mangapark.io")
             {
                 try
                 {
-                    _context.Update(comic);
-                    await _context.SaveChangesAsync();
+                    var httpClient = new HttpClient();
+                    var html = await httpClient.GetStringAsync(url);
+
+                    var titleRegex = new Regex(@"<h3[^>]*class=""[^""]*font-bold[^""]*""[^>]*>.*?<a[^>]*>(.*?)<\/a>", RegexOptions.IgnoreCase);
+                    var match = titleRegex.Match(html);
+                    string title = match.Success ? match.Groups[1].Value.Trim() : "Không tìm thấy tiêu đề";
+                    title = Regex.Replace(title, @"<!--.*?-->", string.Empty, RegexOptions.Singleline);
+                    title = System.Web.HttpUtility.HtmlDecode(title);
+
+                    var authorRegex = new Regex(@"<a[^>]*class=""link link-hover link-primary""[^>]*>(.*?)<\/a>", RegexOptions.IgnoreCase);
+                    var authorMatch = authorRegex.Match(html);
+                    string author = authorMatch.Success ? authorMatch.Groups[1].Value.Trim() : "Không tìm thấy tác giả";
+                    author = Regex.Replace(author, @"<!--.*?-->", string.Empty, RegexOptions.Singleline);
+                    author = System.Web.HttpUtility.HtmlDecode(author);
+
+                    var descriptionRegex = new Regex(@"<div class=""limit-html-p"">(.*?)<\/div>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                    var descriptionMatch = descriptionRegex.Match(html);
+                    string description = descriptionMatch.Success ? descriptionMatch.Groups[1].Value.Trim() : "Không tìm thấy mô tả";
+                    description = Regex.Replace(description, @"<!--.*?-->", string.Empty, RegexOptions.Singleline);
+                    description = System.Web.HttpUtility.HtmlDecode(description);
+
+                    var thumbnailRegex = new Regex(@"<img[^>]*src=""([^""]+)""[^>]*>", RegexOptions.IgnoreCase);
+                    var thumbnailMatch = thumbnailRegex.Match(html);
+                    string thumbnailUrl = thumbnailMatch.Success ? thumbnailMatch.Groups[1].Value : "Không tìm thấy thumbnail";
+
+                    byte[]? imageBytes = null;
+                    if (!string.IsNullOrEmpty(thumbnailUrl) && thumbnailUrl != "Không tìm thấy thumbnail")
+                    {
+                        imageBytes = await ImageHelper.DownloadImageAsync(thumbnailUrl);
+                    }
+
+                    return Json(new
+                    {
+                        title = title,
+                        description = description,
+                        author = author,
+                        thumbnailUrl = thumbnailUrl,
+                        thumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "" 
+                    });
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!ComicExists(comic.ComicId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return Json(new { error = "Lỗi khi lấy dữ liệu: " + ex.Message });
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId", comic.StatusId);
-            return View(comic);
+
+            return Json(new { error = "Trang chưa hỗ trợ" });
         }
 
-        // GET: ManageComics/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        public async Task<IActionResult> SaveComic([FromForm] Comic comic)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            ModelState.Remove("Status");
 
-            var comic = await _context.Comics
-                .Include(c => c.Status)
-                .FirstOrDefaultAsync(m => m.ComicId == id);
-            if (comic == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                comic.CreatedAt = DateTime.Now;
+                comic.UpdatedAt = DateTime.Now;
+                _context.Comics.Add(comic);
+                await _context.SaveChangesAsync();
+                return Ok();
             }
-
-            return View(comic);
+            return BadRequest();
         }
 
-        // POST: ManageComics/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // GET: ManageComics/ManageChapters/?comicId=1
+        public async Task<IActionResult> ManageChapters(int comicId)
         {
-            var comic = await _context.Comics.FindAsync(id);
-            if (comic != null)
+            var comic = _context.Comics
+                                 .Where(c => c.ComicId == comicId)
+                                 .Select(c => new { c.ComicId, c.Title, c.ThumbnailUrl })
+                                 .FirstOrDefault();
+
+            var chapters = _context.Chapters
+                                   .Where(c => c.ComicId == comicId)
+                                   .OrderByDescending(c => c.ChapterNumber)
+                                   .Select(c => new { c.ChapterId, c.Title })
+                                   .ToList();
+
+            byte[]? imageBytes = null;
+            if (!string.IsNullOrEmpty(comic?.ThumbnailUrl))
             {
-                _context.Comics.Remove(comic);
+                imageBytes = await ImageHelper.DownloadImageAsync(comic.ThumbnailUrl);
             }
+            
+            ViewBag.Comic = comic;
+            ViewBag.Chapters = chapters;
+            ViewBag.ThumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "";
+            return View();
+        }
+
+        // POST: FetchChapterData
+        [HttpPost]
+        public async Task<JsonResult> FetchChapterData(string site, string url)
+        {
+            if (site == "mangapark.io")
+            {
+                try
+                {
+                    var httpClient = new HttpClient();
+                    var html = await httpClient.GetStringAsync(url);
+
+                    // Lấy tên truyện và thumbnail
+                    var titleRegex = new Regex(@"<h3[^>]*class=""[^""]*font-bold[^""]*""[^>]*>.*?<a[^>]*>(.*?)<\/a>", RegexOptions.IgnoreCase);
+                    var match = titleRegex.Match(html);
+                    string title = match.Success ? match.Groups[1].Value.Trim() : "Không tìm thấy tiêu đề";
+                    title = Regex.Replace(title, @"<!--.*?-->", string.Empty, RegexOptions.Singleline);
+                    title = System.Web.HttpUtility.HtmlDecode(title);
+
+                    var thumbnailRegex = new Regex(@"<img[^>]*src=""([^""]+)""[^>]*>", RegexOptions.IgnoreCase);
+                    var thumbnailMatch = thumbnailRegex.Match(html);
+                    string thumbnailUrl = thumbnailMatch.Success ? thumbnailMatch.Groups[1].Value : "Không tìm thấy thumbnail";
+
+                    byte[]? imageBytes = null;
+                    if (!string.IsNullOrEmpty(thumbnailUrl) && thumbnailUrl != "Không tìm thấy thumbnail")
+                    {
+                        imageBytes = await ImageHelper.DownloadImageAsync(thumbnailUrl);
+                    }
+
+                    var chapterRegex = new Regex(@"<a[^>]*class=""link-hover link-primary visited:text-accent""[^>]*>(.*?)<\/a>", RegexOptions.IgnoreCase);
+                    var chapterMatches = chapterRegex.Matches(html);
+
+                    var chapters = new List<object>();
+                    foreach (Match chapter in chapterMatches)
+                    {
+                        var linkRegex = new Regex(@"href=""([^""]+)""", RegexOptions.IgnoreCase);
+                        var linkMatch = linkRegex.Match(chapter.Value);
+
+                        if (linkMatch.Success)
+                        {
+                            string chapterLink = "https://mangapark.io" + linkMatch.Groups[1].Value.Trim();
+
+                            string chapterTitle = chapter.Groups[1].Value.Trim();
+
+                            chapters.Add(new
+                            {
+                                Title = chapterTitle,
+                                Link = chapterLink
+                            });
+                        }
+                    }
+
+                    return Json(new
+                    {
+                        title = title,
+                        thumbnailUrl = thumbnailUrl,
+                        thumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "",
+                        chapters = chapters
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { error = "Lỗi khi lấy dữ liệu chương: " + ex.Message });
+                }
+            }
+
+            return Json(new { error = "Trang chưa hỗ trợ" });
+        }
+
+        // POST: Save Chapter
+        [HttpPost]
+        public async Task<IActionResult> SaveChapter(int comicId, string chapterTitle, string chapterLink)
+        {
+            try
+            {
+                var chapterDataJson = await GetChapterContentFromLink(chapterLink);
+
+                if (chapterDataJson.Contains("\"error\""))
+                {
+                    return BadRequest(new { message = "Không thể lấy nội dung chương từ đường dẫn cung cấp." });
+                }
+
+                var lastChapterNumber = await _context.Chapters
+                    .Where(c => c.ComicId == comicId)
+                    .MaxAsync(c => (int?)c.ChapterNumber) ?? 0;
+
+                var chapter = new Chapter
+                {
+                    ComicId = comicId,
+                    ChapterNumber = lastChapterNumber + 1,
+                    Title = chapterTitle,
+                    Content = chapterDataJson,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Chapters.Add(chapter);
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Lưu chương thành công.", chapterId = chapter.ChapterId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lưu chương.", detail = ex.Message });
+            }
+        }
+
+        //GET: ManageComics/GetChapterContentFromLink/?chapterLink=https://mangapark.io/title/233952-en-the-fragrant-flower-blooms-with-dignity/6803178-vol-01-ch-001-rintaro-and-kaoruko
+        public async Task<string> GetChapterContentFromLink(string chapterLink)
+        {
+            var httpClient = new HttpClient();
+            var html = await httpClient.GetStringAsync(chapterLink);
+
+            // Tìm thẻ <script type="qwik/json">...</script>
+            var scriptRegex = new Regex(@"<script[^>]*type=""qwik/json""[^>]*>(.*?)<\/script>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            var match = scriptRegex.Match(html);
+
+            if (!match.Success)
+                return JsonSerializer.Serialize(new { error = "Không tìm thấy script chứa JSON ảnh." });
+
+            string jsonContent = match.Groups[1].Value;
+
+            // Parse JSON
+            using var jsonDoc = JsonDocument.Parse(jsonContent);
+            var root = jsonDoc.RootElement;
+
+            if (!root.TryGetProperty("objs", out var objsArray))
+                return JsonSerializer.Serialize(new { error = "Không tìm thấy mảng ảnh trong JSON." });
+
+            var list = objsArray.EnumerateArray()
+                .Where(e => e.ValueKind == JsonValueKind.String)
+                .Select(e => e.GetString()!)
+                .ToList();
+
+            // Tìm index của "whb"
+            int whbIndex = list.FindIndex(s => s == "whb");
+            if (whbIndex == -1)
+                return JsonSerializer.Serialize(new { error = "Không tìm thấy 'whb' trong mảng." });
+
+            // Duyệt ngược từ whbIndex - 1 trở về, gom các link https cho đến khi gặp chuỗi lạ
+            var imageLinks = new List<string>();
+            for (int i = whbIndex - 1; i >= 0; i--)
+            {
+                if (list[i].StartsWith("https://"))
+                {
+                    imageLinks.Insert(0, list[i]); // Insert đầu để giữ đúng thứ tự ảnh
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return JsonSerializer.Serialize(imageLinks);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteChapter(int chapterId)
+        {
+            var chapter = await _context.Chapters
+                .Include(c => c.ChapterComments)
+                .Include(c => c.ReadingHistories)
+                .FirstOrDefaultAsync(c => c.ChapterId == chapterId);
+
+            if (chapter == null)
+                return NotFound(new { message = "Không tìm thấy chương." });
+
+            _context.ChapterComments.RemoveRange(chapter.ChapterComments);
+            _context.ReadingHistories.RemoveRange(chapter.ReadingHistories);
+            _context.Chapters.Remove(chapter);
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Ok(new { message = "Chương đã được xóa thành công." });
         }
 
-        private bool ComicExists(int id)
-        {
-            return _context.Comics.Any(e => e.ComicId == id);
-        }
     }
 }

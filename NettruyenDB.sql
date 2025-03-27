@@ -11,7 +11,7 @@ CREATE TABLE roles (
     role_id INT IDENTITY(1,1) PRIMARY KEY,
     role_name NVARCHAR(50) NOT NULL UNIQUE
 );
-INSERT INTO roles (role_name) VALUES ('user'), ('admin');
+INSERT INTO roles (role_name) VALUES ('user'), ('member'), ('admin');
 
 CREATE TABLE users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,

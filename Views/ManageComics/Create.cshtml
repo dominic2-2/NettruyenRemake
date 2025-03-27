@@ -4,45 +4,120 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Comic</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ThumbnailUrl" class="control-label"></label>
-                <input asp-for="ThumbnailUrl" class="form-control" />
-                <span asp-validation-for="ThumbnailUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+<!-- Chọn trang hỗ trợ leech -->
+<div class="form-group">
+    <label for="leechSite">Trang web hỗ trợ</label>
+    <select id="leechSite" class="form-control">
+        <option value="mangapark.io">mangapark.io</option>
+        <option value="mangakakalot.com">mangakakalot.com</option>
+        <!-- Add more supported sites here -->
+    </select>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<!-- Nhập link metadata -->
+<div class="form-group">
+    <label for="metaUrl">Link metadata truyện</label>
+    <input type="text" id="metaUrl" class="form-control" placeholder="https://mangapark.io/..." />
+</div>
+
+<!-- Nút lấy dữ liệu -->
+<div class="form-group">
+    <button type="button" class="btn btn-info" id="fetchMetadataBtn">Lấy dữ liệu</button>
+</div>
+
+<hr />
+<!-- Các trường sẽ được auto-fill sau khi leech -->
+<div class="form-group">
+    <label asp-for="Title" class="control-label"></label>
+    <input asp-for="Title" class="form-control" id="Title" />
+</div>
+<div class="form-group">
+    <label asp-for="Description" class="control-label"></label>
+    <input asp-for="Description" class="form-control" id="Description" />
+</div>
+<div class="form-group">
+    <label asp-for="Author" class="control-label"></label>
+    <input asp-for="Author" class="form-control" id="Author" />
+</div>
+<div class="form-group">
+    <label asp-for="ThumbnailUrl" class="control-label"></label>
+    <input asp-for="ThumbnailUrl" class="form-control" id="ThumbnailUrl" />
+</div>
+
+<!-- Preview ảnh -->
+<div class="form-group">
+    <label>Preview ảnh</label>
+    <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="img-thumbnail" style="max-width: 200px; display: none;" />
+</div>
+
+<!-- Nút lưu truyện -->
+<div class="form-group">
+    <button type="button" class="btn btn-success" id="saveComicBtn">Lưu truyện</button>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $('#saveComicBtn').prop('disabled', true);
+
+        $('#fetchMetadataBtn').click(function () {
+            const site = $('#leechSite').val();
+            const url = $('#metaUrl').val();
+
+            $.ajax({
+                url: '/ManageComics/FetchMetadata',
+                type: 'POST',
+                data: { site: site, url: url },
+                success: function (data) {
+                    $('#Title').val(data.title);
+                    $('#Description').val(data.description);
+                    $('#Author').val(data.author);
+                    $('#ThumbnailUrl').val(data.thumbnailUrl);
+
+                    if (data.thumbnailUrl) {
+                        $('#thumbnailPreview')
+                            .attr('src', 'data:image/jpeg;base64,' + data.thumbnailPreview).show();
+                    } else {
+                        $('#thumbnailPreview').hide();
+                    }
+
+                    $('#saveComicBtn').prop('disabled', false);
+                },
+                error: function () {
+                    alert('Lỗi khi lấy dữ liệu metadata.');
+                    $('#saveComicBtn').prop('disabled', true);
+                }
+            });
+        });
+
+        $('#ThumbnailUrl').on('input', function () {
+            const url = $(this).val();
+            if (url) {
+                $('#thumbnailPreview').attr('src', url).show();
+            } else {
+                $('#thumbnailPreview').hide();
+            }
+        });
+
+        $('#saveComicBtn').click(function () {
+            const comic = {
+                Title: $('#Title').val(),
+                Description: $('#Description').val(),
+                Author: $('#Author').val(),
+                ThumbnailUrl: $('#ThumbnailUrl').val(),
+                StatusId: 1
+            };
+
+            $.ajax({
+                url: '/ManageComics/SaveComic',
+                type: 'POST',
+                data: comic,
+                success: function (res) {
+                    alert('Lưu thành công!');
+                },
+                error: function () {
+                    alert('Lỗi khi lưu truyện.');
+                }
+            });
+        });
+    </script>
 }

@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "ManageChapters";
+}
+
+<h1>ManageChapters</h1>
+
+<div class="row">
+    <!-- Bên trái: Dữ liệu từ DB -->
+    <div class="col-md-6">
+        <h3>Thông tin truyện</h3>
+        <input type="hidden" id="comicId" value="@ViewBag.Comic.ComicId" />
+        <div class="form-group">
+            <label for="comicId">Truyện</label>
+            <input type="text" class="form-control" value="@ViewBag.Comic.Title" readonly />
+        </div>
+        <div class="form-group">
+            <label>Preview ảnh</label>
+            @if (!string.IsNullOrEmpty(ViewBag.ThumbnailPreview))
+            {
+                <img id="thumbnailPreviewDB" src="data:image/jpeg;base64,@ViewBag.ThumbnailPreview" alt="Thumbnail Preview DB" class="img-thumbnail" style="max-width: 200px;" />
+            }
+            else
+            {
+                <p>No Thumbnail available</p>
+            }
+        </div>
+        <div class="form-group">
+            <label>Danh sách các chương hiện tại</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Chương</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="chapterListDB">
+                    @foreach (var chapter in ViewBag.Chapters)
+                    {
+                        <tr>
+                            <td>@chapter.Title</td>
+                            <td>
+                                <a href="@chapter.ChapterId" target="_blank" class="btn btn-info">Xem</a>
+                                <button class="btn btn-danger delete-chapter-btn" data-chapterid="@chapter.ChapterId">Xóa</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bên phải: Dữ liệu lấy từ Leech Link -->
+    <div class="col-md-6">
+        <h3>Thêm Chương từ Link Metadata</h3>
+        <div class="form-group">
+            <label for="metaUrl">Link metadata chương</label>
+            <input type="text" id="metaUrl" class="form-control" placeholder="https://mangapark.io/..." />
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-info" id="fetchChapterDataBtn">Lấy dữ liệu chương</button>
+        </div>
+
+        <hr />
+
+        <div class="form-group">
+            <label>Tên truyện</label>
+            <input type="text" id="chapterTitle" class="form-control" readonly />
+        </div>
+        <div class="form-group">
+            <label>Preview ảnh</label>
+            <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="img-thumbnail" style="max-width: 200px; display: none;" />
+        </div>
+
+        <div class="form-group">
+            <label>Danh sách các chương</label>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Chương</th>
+                        <th>Link</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="chapterList"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#fetchChapterDataBtn').click(function () {
+            const site = 'mangapark.io';
+            const url = $('#metaUrl').val();
+
+            $.ajax({
+                url: '/ManageComics/FetchChapterData',
+                type: 'POST',
+                data: { site: site, url: url },
+                success: function (data) {
+                    $('#chapterList').empty();
+                    $('#chapterTitle').val(data.title);
+                    if (data.thumbnailUrl) {
+                        $('#thumbnailPreview')
+                            .attr('src', 'data:image/jpeg;base64,' + data.thumbnailPreview).show();
+                    } else {
+                        $('#thumbnailPreview').hide();
+                    }
+
+                    // Hiển thị danh sách các chương từ leech
+                    data.chapters.forEach(function (chapter) {
+                        $('#chapterList').append(`
+                            <tr>
+                                <td>${chapter.title}</td>
+                                <td><a href="${chapter.link}" target="_blank">${chapter.link}</a></td>
+                                <td><button class="btn btn-primary add-chapter-btn" data-title="${chapter.title}" data-link="${chapter.link}">Add</button></td>
+                            </tr>
+                        `);
+                    });
+                },
+                error: function () {
+                    alert('Lỗi khi lấy dữ liệu chương.');
+                }
+            });
+        });
+
+        $(document).on('click', '.add-chapter-btn', function () {
+            const comicId = $('#comicId').val();
+            const chapterTitle = $(this).data('title');
+            const chapterLink = $(this).data('link');
+
+            $.ajax({
+                url: '/ManageComics/SaveChapter',
+                type: 'POST',
+                data: { comicId: comicId, chapterTitle: chapterTitle, chapterLink: chapterLink },
+                success: function (res) {
+                    alert('Đã thêm ' + chapterTitle);
+                    const chapterId = res.chapterId;
+                    $('#chapterListDB').prepend(`
+                        <tr>
+                            <td>${chapterTitle}</td>
+                            <td>
+                                <a href="#" target="_blank" class="btn btn-info">Xem</a>
+                                <button class="btn btn-danger delete-chapter-btn" data-chapterid="${chapterId}">Xóa</button>
+                            </td>
+                        </tr>
+                    `);
+                },
+                error: function () {
+                    alert('Lỗi khi thêm chương.');
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-chapter-btn', function () {
+            const chapterId = $(this).data('chapterid');
+
+            if (confirm('Bạn có chắc chắn muốn xóa chương này không?')) {
+                $.ajax({
+                    url: '/ManageComics/DeleteChapter',
+                    type: 'POST',
+                    data: { chapterId: chapterId },
+                    success: function () {
+                        alert('Chương đã được xóa!');
+                        $(`button[data-chapterid="${chapterId}"]`).closest('tr').remove();
+                    },
+                    error: function () {
+                        alert('Lỗi khi xóa chương.');
+                    }
+                });
+            }
+        });
+
+    </script>
+}
