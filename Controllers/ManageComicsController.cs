@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NettruyenRemake.Helpers;
 using NettruyenRemake.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NettruyenRemake.Controllers
 {
@@ -38,7 +36,7 @@ namespace NettruyenRemake.Controllers
             return View(comics);
         }
 
-
+        // GET: ManageComics/LoadComicsPartial/
         public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 1)
         {
             int totalComics = await _context.Comics.CountAsync();
@@ -56,7 +54,6 @@ namespace NettruyenRemake.Controllers
 
             return PartialView("_ComicListPartial", comics);
         }
-
 
         // GET: ManageComics/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -159,10 +156,6 @@ namespace NettruyenRemake.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-        // GET: ManageComics/LoadComicsPartial
-      
-
-    }
 
         // GET: ManageComics/Create
         public IActionResult Create()
