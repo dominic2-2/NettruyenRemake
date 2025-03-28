@@ -1,0 +1,58 @@
+﻿@model IEnumerable<NettruyenRemake.Models.ReadingHistory>
+
+@{
+    ViewData["Title"] = "Lịch Sử Đọc Truyện";
+    var now = DateTime.Now;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch Sử Đọc Truyện</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-black font-sans">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">📖 Lịch Sử Đọc Truyện</h1>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            @foreach (var item in Model)
+            {
+                var comic = item.Comic;
+                var chapter = item.Chapter;
+                var timeAgo = now - item.LastReadAt.GetValueOrDefault();
+                var timeText = timeAgo.TotalMinutes < 60
+                ? $"{(int)timeAgo.TotalMinutes} phút trước"
+                : timeAgo.TotalHours < 24
+                ? $"{(int)timeAgo.TotalHours} giờ trước"
+                : $"{(int)timeAgo.TotalDays} ngày trước";
+
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                    <a href="@Url.Action("Detail", "Comic", new { id = comic.ComicId })">
+                        <img src="@comic.ThumbnailUrl"
+                             alt="@comic.Title"
+                             class="w-full h-64 object-cover"
+                             style="aspect-ratio: 3/4;"
+                             onerror="this.src='https://via.placeholder.com/150x200';" />
+                    </a>
+
+                    <div class="p-4">
+                        <h2 class="text-lg font-bold truncate mb-1">@comic.Title</h2>
+                        <p class="text-sm text-gray-600">Trạng thái: @(comic.Status?.StatusName ?? "Không rõ")</p>
+
+                        @* Link đến chương đã đọc *@
+                        <p class="text-sm text-blue-600 mt-2">
+                            <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" class="hover:underline">
+                                📘 Đọc tiếp: Chapter @chapter.ChapterNumber@(string.IsNullOrEmpty(chapter.Title) ? "" : $" - {chapter.Title}")
+                            </a>
+                        </p>
+
+                        <p class="text-xs text-gray-500 mt-1">Lần đọc gần nhất: @timeText</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>
