@@ -5,49 +5,60 @@
 }
 
 <h1>Edit</h1>
-
-<h4>Comic</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ComicId" />
+
+            <input asp-for="ComicId" type="hidden" />
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Author" class="control-label"></label>
                 <input asp-for="Author" class="form-control" />
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="StatusId" class="control-label"></label>
-                <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
+                <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId">
+                    <!-- Nếu muốn có thêm option label "Chọn status..." thì thêm:
+                    <option value="">-- Chọn status --</option>
+                    -->
+                </select>
                 <span asp-validation-for="StatusId" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="ThumbnailUrl" class="control-label"></label>
                 <input asp-for="ThumbnailUrl" class="form-control" />
                 <span asp-validation-for="ThumbnailUrl" class="text-danger"></span>
             </div>
+
+            <!-- Chỉ hiển thị CreatedAt/UpdatedAt, không cho sửa -->
             <div class="form-group">
                 <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                <input asp-for="CreatedAt" class="form-control"  />
             </div>
             <div class="form-group">
                 <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control" />
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+                <input asp-for="UpdatedAt" class="form-control"  />
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -55,10 +66,22 @@
     </div>
 </div>
 
+@if (ViewBag.ModelStateErrors != null)
+{
+    <div style="color:red;">
+        @foreach (var err in ViewBag.ModelStateErrors)
+        {
+            <p>@err</p>
+        }
+    </div>
+}
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

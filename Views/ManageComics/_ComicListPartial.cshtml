@@ -1,0 +1,74 @@
+﻿
+ @model IEnumerable<NettruyenRemake.Models.Comic>
+
+<!-- Hiển thị danh sách -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().ComicId)</th>
+            <th>@Html.DisplayNameFor(model => model.First().ThumbnailUrl)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Title)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Author)</th>
+            <th>@Html.DisplayNameFor(model => model.First().CreatedAt)</th>
+            <th>@Html.DisplayNameFor(model => model.First().UpdatedAt)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(m => item.ComicId)</td>
+                <td>@Html.DisplayFor(m => item.ThumbnailUrl)</td>
+                <td>@Html.DisplayFor(m => item.Title)</td>
+                <td>@Html.DisplayFor(m => item.Author)</td>
+                <td>@Html.DisplayFor(m => item.CreatedAt)</td>
+                <td>@Html.DisplayFor(m => item.UpdatedAt)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ComicId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ComicId">Delete</a> |
+                    <a asp-action="View" asp-route-id="@item.ComicId">View</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<!-- Pagination -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(ViewBag.CurrentPage - 1))">Previous</a>
+                </li>
+            }
+            @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+            {
+                if (i == (int)ViewBag.CurrentPage)
+                {
+                    <li class="page-item active">
+                        <span class="page-link">@i</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0);" onclick="loadPage(@i)">@i</a>
+                    </li>
+                }
+            }
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(ViewBag.CurrentPage + 1))">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

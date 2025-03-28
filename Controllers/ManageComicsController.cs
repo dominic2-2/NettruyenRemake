@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using NettruyenRemake.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NettruyenRemake.Controllers
 {
@@ -21,121 +17,122 @@ namespace NettruyenRemake.Controllers
         // GET: ManageComics
         public async Task<IActionResult> Index()
         {
-            var nettruyenDbContext = _context.Comics.Include(c => c.Status);
-            return View(await nettruyenDbContext.ToListAsync());
-        }
-
-        // GET: ManageComics/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comic = await _context.Comics
+            var comics = await _context.Comics
                 .Include(c => c.Status)
-                .FirstOrDefaultAsync(m => m.ComicId == id);
-            if (comic == null)
-            {
-                return NotFound();
-            }
+                .ToListAsync();
 
-            return View(comic);
+            // Giả sử pageSize = 10
+            int totalPages = (int)Math.Ceiling(comics.Count() / 10.0);
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = 1;
+
+            return View(comics);
         }
 
-        // GET: ManageComics/Create
-        public IActionResult Create()
+
+        public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 1)
         {
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId");
-            return View();
+            int totalComics = await _context.Comics.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
+
+            var comics = await _context.Comics
+                .Include(c => c.Status)
+                .OrderBy(c => c.ComicId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+
+            return PartialView("_ComicListPartial", comics);
         }
 
-        // POST: ManageComics/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ComicId,Title,Description,Author,StatusId,ThumbnailUrl,CreatedAt,UpdatedAt")] Comic comic)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(comic);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId", comic.StatusId);
-            return View(comic);
-        }
 
         // GET: ManageComics/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var comic = await _context.Comics.FindAsync(id);
-            if (comic == null)
-            {
-                return NotFound();
-            }
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId", comic.StatusId);
+            if (comic == null) return NotFound();
+
+            // Tạo dropdown: Value = StatusId, Text = StatusName, SelectedValue = comic.StatusId
+            ViewData["StatusId"] = new SelectList(
+                _context.ComicStatuses,
+                "StatusId",
+                "StatusName",
+                comic.StatusId
+            );
+
             return View(comic);
         }
 
         // POST: ManageComics/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ComicId,Title,Description,Author,StatusId,ThumbnailUrl,CreatedAt,UpdatedAt")] Comic comic)
+        public async Task<IActionResult> Edit(int id, [Bind("ComicId,Title,Description,Author,StatusId,ThumbnailUrl")] Comic comic)
         {
             if (id != comic.ComicId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Xóa bỏ các trường không bind hoặc gây lỗi, bao gồm navigation property "Status"
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("UpdatedAt");
+            ModelState.Remove("Status"); // Loại bỏ lỗi validate của thuộc tính Status
+
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(comic);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ComicExists(comic.ComicId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                // Load lại dropdown nếu validation fail
+                ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusName", comic.StatusId);
+                return View(comic);
+            }
+
+            var comicToUpdate = await _context.Comics.FindAsync(id);
+            if (comicToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật các trường cho phép
+            comicToUpdate.Title = comic.Title;
+            comicToUpdate.Description = comic.Description;
+            comicToUpdate.Author = comic.Author;
+            comicToUpdate.ThumbnailUrl = comic.ThumbnailUrl;
+            comicToUpdate.StatusId = comic.StatusId; // Giá trị từ dropdown
+            comicToUpdate.UpdatedAt = DateTime.Now;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Cập nhật truyện thành công!";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusId", comic.StatusId);
-            return View(comic);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Comics.Any(e => e.ComicId == comic.ComicId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
+
 
         // GET: ManageComics/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var comic = await _context.Comics
                 .Include(c => c.Status)
                 .FirstOrDefaultAsync(m => m.ComicId == id);
-            if (comic == null)
-            {
-                return NotFound();
-            }
+            if (comic == null) return NotFound();
 
             return View(comic);
         }
@@ -149,15 +146,12 @@ namespace NettruyenRemake.Controllers
             if (comic != null)
             {
                 _context.Comics.Remove(comic);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        // GET: ManageComics/LoadComicsPartial
+      
 
-        private bool ComicExists(int id)
-        {
-            return _context.Comics.Any(e => e.ComicId == id);
-        }
     }
 }
