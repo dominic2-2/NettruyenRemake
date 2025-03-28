@@ -27,7 +27,7 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ComicId">Edit</a> |
                     <a asp-action="Delete" asp-route-id="@item.ComicId">Delete</a> |
-                    <a asp-action="View" asp-route-id="@item.ComicId">View</a>
+                    <a type="button" class="btn btn-info" href="/ManageComics/ManageChapters/?comicId=@item.ComicId">Manage Chapter</a>
 
                 </td>
             </tr>

@@ -21,7 +21,7 @@
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                     <!-- Ảnh có link sang trang chi tiết -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@comic.ThumbnailUrl"
+                        <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
                              alt="@comic.Title"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
@@ -61,7 +61,7 @@
 
                     <!-- Bọc ảnh bằng link tới chi tiết -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@comic.ThumbnailUrl"
+                        <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
                              alt="@comic.Title"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
@@ -112,7 +112,7 @@
 
                     <!-- Ảnh có link -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@comic.ThumbnailUrl"
+                        <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
                              onerror="this.src='https://via.placeholder.com/150x200';">
@@ -152,7 +152,7 @@
 
                     <!-- Ảnh có link -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@comic.ThumbnailUrl"
+                        <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
                              onerror="this.src='https://via.placeholder.com/150x200';">
@@ -191,7 +191,7 @@
 
                     <!-- Ảnh có link -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@comic.ThumbnailUrl"
+                        <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
                              onerror="this.src='https://via.placeholder.com/150x200';">

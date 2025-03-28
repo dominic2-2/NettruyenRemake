@@ -34,12 +34,10 @@ namespace NettruyenRemake.Controllers
 
                 if (existingHistory != null)
                 {
-                    // Cập nhật thời gian đọc mới nhất
                     existingHistory.LastReadAt = DateTime.Now;
                 }
                 else
                 {
-                    // Tạo mới bản ghi lịch sử đọc
                     var history = new ReadingHistory
                     {
                         UserId = userId.Value,
@@ -54,8 +52,31 @@ namespace NettruyenRemake.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // 👉 Giải mã JSON -> List<string>
+            List<string> images = new();
+            if (!string.IsNullOrEmpty(chapter.Content))
+            {
+                images = System.Text.Json.JsonSerializer.Deserialize<List<string>>(chapter.Content) ?? new List<string>();
+            }
+            // Lấy toàn bộ danh sách chương thuộc truyện này
+            var allChapters = await _context.Chapters
+                .Where(c => c.ComicId == chapter.ComicId)
+                .OrderBy(c => c.ChapterNumber)
+                .ToListAsync();
+
+            var currentIndex = allChapters.FindIndex(c => c.ChapterId == id);
+
+            Chapter? previousChapter = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
+            Chapter? nextChapter = currentIndex < allChapters.Count - 1 ? allChapters[currentIndex + 1] : null;
+
+            ViewBag.PreviousChapter = previousChapter;
+            ViewBag.NextChapter = nextChapter;
+            ViewBag.ChapterList = allChapters;
+
+            ViewBag.Images = images;
             return View(chapter);
         }
+
         public async Task<IActionResult> History()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");

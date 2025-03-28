@@ -29,8 +29,8 @@
                 : $"{(int)timeAgo.TotalDays} ngày trước";
 
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                    <a href="@Url.Action("Detail", "Comic", new { id = comic.ComicId })">
-                        <img src="@comic.ThumbnailUrl"
+                    <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
+                        <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
                              alt="@comic.Title"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
