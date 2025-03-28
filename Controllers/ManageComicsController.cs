@@ -304,5 +304,21 @@ namespace NettruyenRemake.Controllers
             return Ok(new { message = "Chương đã được xóa thành công." });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GetImagePreview(string imageUrl)
+        {
+            byte[]? imageBytes = null;
+            if (!string.IsNullOrEmpty(imageUrl) && imageUrl != "Không tìm thấy thumbnail")
+            {
+                imageBytes = await ImageHelper.DownloadImageAsync(imageUrl);
+            }
+
+            return Json(new
+            {
+                imagePreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : ""
+            });
+        }
+
+
     }
 }

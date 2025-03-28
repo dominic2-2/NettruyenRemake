@@ -92,11 +92,26 @@
         $('#ThumbnailUrl').on('input', function () {
             const url = $(this).val();
             if (url) {
-                $('#thumbnailPreview').attr('src', url).show();
+                $.ajax({
+                    url: '/ManageComics/GetImagePreview',
+                    type: 'POST',
+                    data: { imageUrl: url },
+                    success: function (data) {
+                        if (data.imagePreview) {
+                            $('#thumbnailPreview').attr('src', 'data:image/jpeg;base64,' + data.imagePreview).show();
+                        } else {
+                            $('#thumbnailPreview').hide();
+                        }
+                    },
+                    error: function () {
+                        $('#thumbnailPreview').hide();
+                    }
+                });
             } else {
                 $('#thumbnailPreview').hide();
             }
         });
+
 
         $('#saveComicBtn').click(function () {
             const comic = {
