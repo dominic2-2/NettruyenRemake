@@ -77,15 +77,20 @@
                         <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex">
                             <!-- ẢNH TRUYỆN -->
                             <div class="w-40">
-                                <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
-                                     class="h-full w-full object-cover"
-                                     style="aspect-ratio: 3/4;"
-                                     onerror="this.src='https://via.placeholder.com/150x200';">
+                                <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
+                                    <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
+                                         class="h-full w-full object-cover"
+                                         style="aspect-ratio: 3/4;"
+                                         onerror="this.src='https://via.placeholder.com/150x200';">
+                                </a>
                             </div>
 
                             <!-- THÔNG TIN TRUYỆN -->
                             <div class="flex-1 p-4">
-                                <h3 class="text-lg font-semibold mb-1">@comic.Title</h3>
+                                <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })" class="hover:underline hover:text-indigo-700 transition">
+                                    <h3 class="text-lg font-semibold mb-1">@comic.Title</h3>
+                                </a>
+
                                 <p class="text-sm text-gray-500 mb-2">✍️ Tác giả: @comic.Author</p>
 
                                 <ul class="space-y-1 mb-3">
@@ -101,6 +106,7 @@
                                 </ul>
                             </div>
                         </div>
+
                     }
 
                 </div>
