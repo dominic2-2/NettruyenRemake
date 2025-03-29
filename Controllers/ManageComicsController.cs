@@ -160,8 +160,14 @@ namespace NettruyenRemake.Controllers
         // GET: ManageComics/Create
         public IActionResult Create()
         {
+            var categories = _context.Categories
+                .OrderBy(c => c.CategoryName)
+                .ToList();
+
+            ViewBag.AllCategories = categories;
             return View();
         }
+
 
         [HttpPost]
         public async Task<JsonResult> FetchMetadata(string site, string url)
@@ -172,6 +178,23 @@ namespace NettruyenRemake.Controllers
                 {
                     var httpClient = new HttpClient();
                     var html = await httpClient.GetStringAsync(url);
+
+
+                    // Regex lấy các thể loại
+                    var categoryRegex = new Regex(@"<span[^>]*class=""badge[^""]*""[^>]*>(.*?)<\/span>", RegexOptions.IgnoreCase);
+                    var categoryMatches = categoryRegex.Matches(html);
+
+                    List<string> categories = new List<string>();
+                    foreach (Match catmatch in categoryMatches)
+                    {
+                        var raw = catmatch.Groups[1].Value.Trim();
+                        var decoded = System.Web.HttpUtility.HtmlDecode(raw);
+                        if (!string.IsNullOrWhiteSpace(decoded))
+                        {
+                            categories.Add(decoded);
+                        }
+                    }
+
 
                     var titleRegex = new Regex(@"<h3[^>]*class=""[^""]*font-bold[^""]*""[^>]*>.*?<a[^>]*>(.*?)<\/a>", RegexOptions.IgnoreCase);
                     var match = titleRegex.Match(html);
@@ -207,7 +230,8 @@ namespace NettruyenRemake.Controllers
                         description = description,
                         author = author,
                         thumbnailUrl = thumbnailUrl,
-                        thumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "" 
+                        thumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "" ,
+                        categories = categories
                     });
                 }
                 catch (Exception ex)
@@ -220,7 +244,7 @@ namespace NettruyenRemake.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveComic([FromForm] Comic comic)
+        public async Task<IActionResult> SaveComic([FromForm] Comic comic, [FromForm] string Categories)
         {
             ModelState.Remove("Status");
 
@@ -230,10 +254,37 @@ namespace NettruyenRemake.Controllers
                 comic.UpdatedAt = DateTime.Now;
                 _context.Comics.Add(comic);
                 await _context.SaveChangesAsync();
+
+                // Xử lý lưu category
+                if (!string.IsNullOrEmpty(Categories))
+                {
+                    var categoryNames = JsonSerializer.Deserialize<List<string>>(Categories);
+
+                    foreach (var name in categoryNames)
+                    {
+                        var category = await _context.Categories
+                            .FirstOrDefaultAsync(c => c.CategoryName.ToLower() == name.ToLower());
+
+                        if (category == null)
+                        {
+                            category = new Category { CategoryName = name };
+                            _context.Categories.Add(category);
+                            await _context.SaveChangesAsync();
+                        }
+
+                        // 💥 Thay vì dùng ComicCategory, ta gán trực tiếp:
+                        comic.Categories.Add(category);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+
                 return Ok();
             }
+
             return BadRequest();
         }
+
 
         // GET: ManageComics/ManageChapters/?comicId=1
         public async Task<IActionResult> ManageChapters(int comicId)

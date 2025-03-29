@@ -1,58 +1,83 @@
 ﻿@model NettruyenRemake.Models.Comic
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo truyện mới";
 }
 
-<!-- Chọn trang hỗ trợ leech -->
-<div class="form-group">
-    <label for="leechSite">Trang web hỗ trợ</label>
+<h2 class="mb-4">📝 Tạo truyện mới</h2>
+
+<!-- Chọn trang web hỗ trợ leech -->
+<div class="form-group mb-3">
+    <label for="leechSite">Trang hỗ trợ</label>
     <select id="leechSite" class="form-control">
         <option value="mangapark.io">mangapark.io</option>
-        <option value="mangakakalot.com">mangakakalot.com</option>
-        <!-- Add more supported sites here -->
     </select>
 </div>
 
-<!-- Nhập link metadata -->
-<div class="form-group">
-    <label for="metaUrl">Link metadata truyện</label>
-    <input type="text" id="metaUrl" class="form-control" placeholder="https://mangapark.io/..." />
+<!-- Nhập link cần leech -->
+<div class="form-group mb-3">
+    <label for="metaUrl">URL truyện</label>
+    <input type="text" id="metaUrl" class="form-control" placeholder="https://..." />
 </div>
 
 <!-- Nút lấy dữ liệu -->
-<div class="form-group">
+<div class="form-group mb-4">
     <button type="button" class="btn btn-info" id="fetchMetadataBtn">Lấy dữ liệu</button>
 </div>
 
 <hr />
-<!-- Các trường sẽ được auto-fill sau khi leech -->
-<div class="form-group">
-    <label asp-for="Title" class="control-label"></label>
+
+<!-- Các trường auto-fill -->
+<div class="form-group mb-3">
+    <label asp-for="Title" class="control-label">Tên truyện</label>
     <input asp-for="Title" class="form-control" id="Title" />
 </div>
-<div class="form-group">
-    <label asp-for="Description" class="control-label"></label>
-    <input asp-for="Description" class="form-control" id="Description" />
-</div>
-<div class="form-group">
-    <label asp-for="Author" class="control-label"></label>
+
+<div class="form-group mb-3">
+    <label asp-for="Author" class="control-label">Tác giả</label>
     <input asp-for="Author" class="form-control" id="Author" />
 </div>
-<div class="form-group">
-    <label asp-for="ThumbnailUrl" class="control-label"></label>
+
+<div class="form-group mb-3">
+    <label asp-for="Description" class="control-label">Mô tả</label>
+    <input asp-for="Description" class="form-control" id="Description" />
+</div>
+
+<div class="form-group mb-3">
+    <label asp-for="ThumbnailUrl" class="control-label">Thumbnail</label>
     <input asp-for="ThumbnailUrl" class="form-control" id="ThumbnailUrl" />
 </div>
 
-<!-- Preview ảnh -->
-<div class="form-group">
-    <label>Preview ảnh</label>
+<!-- Ảnh preview -->
+<div class="form-group mb-3">
+    <label>Ảnh preview</label>
     <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="img-thumbnail" style="max-width: 200px; display: none;" />
 </div>
 
-<!-- Nút lưu truyện -->
+<!-- Checkboxes thể loại từ DB -->
+<div class="form-group mb-4">
+    <label>Thể loại</label>
+    <div id="categoryContainer" class="form-check">
+        @if (ViewBag.AllCategories != null)
+        {
+            foreach (var cat in ViewBag.AllCategories as List<NettruyenRemake.Models.Category>)
+            {
+                <div class="form-check form-check-inline">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           name="category"
+                           value="@cat.CategoryName"
+                           id="cat_@cat.CategoryId" />
+                    <label class="form-check-label me-3" for="cat_@cat.CategoryId">@cat.CategoryName</label>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Nút lưu -->
 <div class="form-group">
-    <button type="button" class="btn btn-success" id="saveComicBtn">Lưu truyện</button>
+    <button type="button" class="btn btn-success" id="saveComicBtn" disabled>Lưu truyện</button>
 </div>
 
 @section Scripts {
@@ -69,15 +94,25 @@
                 data: { site: site, url: url },
                 success: function (data) {
                     $('#Title').val(data.title);
-                    $('#Description').val(data.description);
                     $('#Author').val(data.author);
+                    $('#Description').val(data.description);
                     $('#ThumbnailUrl').val(data.thumbnailUrl);
 
-                    if (data.thumbnailUrl) {
-                        $('#thumbnailPreview')
-                            .attr('src', 'data:image/jpeg;base64,' + data.thumbnailPreview).show();
+                    if (data.thumbnailPreview) {
+                        $('#thumbnailPreview').attr('src', 'data:image/jpeg;base64,' + data.thumbnailPreview).show();
                     } else {
                         $('#thumbnailPreview').hide();
+                    }
+
+                    // ✅ Auto-check thể loại nếu trùng với trong DB
+                    if (data.categories) {
+                        const categoriesFromWeb = data.categories.map(c => c.toLowerCase());
+                        $('input[name="category"]').each(function () {
+                            const val = $(this).val().toLowerCase();
+                            if (categoriesFromWeb.includes(val)) {
+                                $(this).prop('checked', true);
+                            }
+                        });
                     }
 
                     $('#saveComicBtn').prop('disabled', false);
@@ -112,7 +147,6 @@
             }
         });
 
-
         $('#saveComicBtn').click(function () {
             const comic = {
                 Title: $('#Title').val(),
@@ -122,12 +156,26 @@
                 StatusId: 1
             };
 
+            const selectedCategories = [];
+            $('input[name="category"]:checked').each(function () {
+                selectedCategories.push($(this).val());
+            });
+
+            const formData = new FormData();
+            for (let key in comic) {
+                formData.append(key, comic[key]);
+            }
+            formData.append("Categories", JSON.stringify(selectedCategories));
+
             $.ajax({
                 url: '/ManageComics/SaveComic',
                 type: 'POST',
-                data: comic,
-                success: function (res) {
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
                     alert('Lưu thành công!');
+                    window.location.href = '/ManageComics';
                 },
                 error: function () {
                     alert('Lỗi khi lưu truyện.');
