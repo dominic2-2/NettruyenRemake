@@ -22,24 +22,24 @@ namespace NettruyenRemake.Controllers
             return View();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> FixPasswords()
-        {
-            var users = _context.Users.ToList();
+        //[HttpGet]
+        //public async Task<IActionResult> FixPasswords()
+        //{
+        //    var users = _context.Users.ToList();
 
-            foreach (var user in users)
-            {
-                // Check if password is already hashed (a valid bcrypt hash starts with "$2a$", "$2b$", or "$2y$")
-                if (!user.PasswordHash.StartsWith("$2"))
-                {
-                    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash); // Hash only if it's plain text
-                }
-            }
+        //    foreach (var user in users)
+        //    {
+        //        // Check if password is already hashed (a valid bcrypt hash starts with "$2a$", "$2b$", or "$2y$")
+        //        if (!user.PasswordHash.StartsWith("$2"))
+        //        {
+        //            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash); // Hash only if it's plain text
+        //        }
+        //    }
 
-            await _context.SaveChangesAsync();
+        //    await _context.SaveChangesAsync();
 
-            return Content("Password hashes updated successfully!");
-        }
+        //    return Content("Password hashes updated successfully!");
+        //}
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
