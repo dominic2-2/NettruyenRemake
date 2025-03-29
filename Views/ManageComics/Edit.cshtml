@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Edit Comic";
+    var allCats = ViewBag.AllCategories as List<NettruyenRemake.Models.Category>;
 }
 
 <div class="container mt-5">
@@ -12,7 +13,6 @@
         <div class="card-body">
             <form asp-action="Edit" method="post" class="needs-validation" novalidate>
                 @Html.AntiForgeryToken()
-
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                 <input asp-for="ComicId" type="hidden" />
 
@@ -72,6 +72,28 @@
                         <div class="form-floating">
                             <input type="text" name="newThumbnailUrl" id="newThumbnailUrl" class="form-control" placeholder="https://..." />
                             <label for="newThumbnailUrl" class="form-label">Replace Thumbnail (Image URL)</label>
+                        </div>
+                    </div>
+
+                    <!-- Category Checkboxes -->
+                    <div class="col-md-12">
+                        <label class="fw-bold">Thể loại</label>
+                        <div>
+                            @if (allCats != null)
+                            {
+                                foreach (var cat in allCats)
+                                {
+                                    bool isChecked = Model.Categories.Any(c => c.CategoryId == cat.CategoryId);
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="CategoryIds"
+                                               value="@cat.CategoryId"
+                                        @(isChecked ? "checked" : "") />
+                                        <label class="form-check-label">@cat.CategoryName</label>
+                                    </div>
+                                }
+                            }
                         </div>
                     </div>
 
