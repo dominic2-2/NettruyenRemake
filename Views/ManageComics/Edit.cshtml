@@ -1,87 +1,182 @@
 ﻿@model NettruyenRemake.Models.Comic
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Comic";
 }
 
-<h1>Edit</h1>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" method="post">
-            @Html.AntiForgeryToken()
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Edit Comic</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input asp-for="ComicId" type="hidden" />
 
-            <input asp-for="ComicId" type="hidden" />
+                <div class="row g-3">
+                    <!-- Title -->
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input asp-for="Title" class="form-control" placeholder="Title" required />
+                            <label asp-for="Title" class="form-label">Title</label>
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
+                    <!-- Description -->
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input asp-for="Description" class="form-control" placeholder="Description" />
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+                    <!-- Author -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Author" class="form-control" placeholder="Author" />
+                            <label asp-for="Author" class="form-label">Author</label>
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select asp-for="StatusId" class="form-select" asp-items="ViewBag.StatusId">
+                                <option value="">-- Select Status --</option>
+                            </select>
+                            <label asp-for="StatusId" class="form-label">Status</label>
+                            <span asp-validation-for="StatusId" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="StatusId" class="control-label"></label>
-                <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId">
-                    <!-- Nếu muốn có thêm option label "Chọn status..." thì thêm:
-                    <option value="">-- Chọn status --</option>
-                    -->
-                </select>
-                <span asp-validation-for="StatusId" class="text-danger"></span>
-            </div>
+                    <!-- Thumbnail Preview -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Current Image</label>
+                        @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                        {
+                            <div class="thumbnail-preview mb-3">
+                                <img src="@Url.Action("GetThumbnailPreview", "ManageComics", new { url = Model.ThumbnailUrl })"
+                                     alt="Current Thumbnail" class="img-fluid rounded shadow-sm" style="max-height: 150px;" />
+                            </div>
+                        }
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="ThumbnailUrl" class="control-label"></label>
-                <input asp-for="ThumbnailUrl" class="form-control" />
-                <span asp-validation-for="ThumbnailUrl" class="text-danger"></span>
-            </div>
+                    <!-- New Thumbnail URL -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" name="newThumbnailUrl" id="newThumbnailUrl" class="form-control" placeholder="https://..." />
+                            <label for="newThumbnailUrl" class="form-label">Replace Thumbnail (Image URL)</label>
+                        </div>
+                    </div>
 
-            <!-- Chỉ hiển thị CreatedAt/UpdatedAt, không cho sửa -->
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control"  />
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control"  />
-            </div>
+                    <!-- CreatedAt -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="CreatedAt" class="form-control" readonly />
+                            <label asp-for="CreatedAt" class="form-label">Created At</label>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                    <!-- UpdatedAt -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="UpdatedAt" class="form-control" readonly />
+                            <label asp-for="UpdatedAt" class="form-label">Updated At</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-4 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                    <input type="submit" value="Save Changes" class="btn btn-primary px-4" />
+                </div>
+            </form>
+
+            <!-- Model State Errors -->
+            @if (ViewBag.ModelStateErrors != null)
+            {
+                <div class="alert alert-danger mt-3" role="alert">
+                    @foreach (var err in ViewBag.ModelStateErrors)
+                    {
+                        <p class="mb-0">@err</p>
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
 
-@if (ViewBag.ModelStateErrors != null)
-{
-    <div style="color:red;">
-        @foreach (var err in ViewBag.ModelStateErrors)
-        {
-            <p>@err</p>
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+    }
+
+    .form-floating > label {
+        color: #6c757d;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
         }
-    </div>
-}
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    .thumbnail-preview img {
+        transition: transform 0.3s ease;
+    }
+
+        .thumbnail-preview img:hover {
+            transform: scale(1.05);
+        }
+</style>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
 }

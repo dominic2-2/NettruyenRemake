@@ -1,72 +1,200 @@
-﻿
- @model IEnumerable<NettruyenRemake.Models.Comic>
+﻿@model IEnumerable<NettruyenRemake.Models.Comic>
+
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Thêm thanh cuộn ngang nếu bảng quá rộng trên màn hình nhỏ */
+    }
+
+    .comic-table {
+        width: 100%; /* Sửa từ 140% thành 100% để bảng không bị lệch */
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .comic-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .comic-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .comic-table tr:hover {
+            background: #f5f5f5;
+            transition: background 0.2s;
+        }
+
+    .thumbnail-img {
+        width: 60px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Căn chỉnh các nút bằng flex */
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        height: 100%;
+    }
+
+        .action-buttons a {
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+    /* Nút View với màu riêng */
+    .btn-view {
+        background: #28a745; /* Màu xanh lá cho nút View */
+        color: white;
+    }
+
+        .btn-view:hover {
+            background: #218838;
+        }
+
+    .btn-edit {
+        background: #007bff;
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background: #0056b3;
+        }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+    .btn-chapters {
+        background: #17a2b8;
+        color: white;
+    }
+
+        .btn-chapters:hover {
+            background: #138496;
+        }
+
+    .pagination {
+        margin: 20px 0;
+        justify-content: center;
+    }
+
+    .page-link {
+        border-radius: 4px;
+        margin: 0 3px;
+        padding: 8px 14px;
+        color: #007bff;
+        font-size: 14px;
+    }
+
+    .page-item.active .page-link {
+        background: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .page-link:hover {
+        background: #e9ecef;
+        color: #0056b3;
+    }
+</style>
 
 <!-- Hiển thị danh sách -->
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.First().ComicId)</th>
-            <th>@Html.DisplayNameFor(model => model.First().ThumbnailUrl)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Title)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Author)</th>
-            <th>@Html.DisplayNameFor(model => model.First().CreatedAt)</th>
-            <th>@Html.DisplayNameFor(model => model.First().UpdatedAt)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="table-container">
+    <table class="comic-table">
+        <thead>
             <tr>
-                <td>@Html.DisplayFor(m => item.ComicId)</td>
-                <td>@Html.DisplayFor(m => item.ThumbnailUrl)</td>
-                <td>@Html.DisplayFor(m => item.Title)</td>
-                <td>@Html.DisplayFor(m => item.Author)</td>
-                <td>@Html.DisplayFor(m => item.CreatedAt)</td>
-                <td>@Html.DisplayFor(m => item.UpdatedAt)</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.ComicId">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ComicId">Delete</a> |
-                    <a type="button" class="btn btn-info" href="/ManageComics/ManageChapters/?comicId=@item.ComicId">Manage Chapter</a>
-
-                </td>
+                <th style="width: 5%;">@Html.DisplayNameFor(model => model.First().ComicId)</th>
+                <th style="width: 10%;">Image</th>
+                <th style="width: 25%;">@Html.DisplayNameFor(model => model.First().Title)</th>
+                <th style="width: 15%;">@Html.DisplayNameFor(model => model.First().Author)</th>
+                <th style="width: 13%;">@Html.DisplayNameFor(model => model.First().CreatedAt)</th>
+                <th style="width: 13%;">@Html.DisplayNameFor(model => model.First().UpdatedAt)</th>
+                <th style="width: 19%;">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
-
-
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(m => item.ComicId)</td>
+                    <td>
+                        <img src="@Url.Action("GetThumbnail", "ManageComics", new { url = item.ThumbnailUrl })"
+                             alt="@item.Title"
+                             class="thumbnail-img" />
+                    </td>
+                    <td>@Html.DisplayFor(m => item.Title)</td>
+                    <td>@Html.DisplayFor(m => item.Author)</td>
+                    <td>@Html.DisplayFor(m => item.CreatedAt)</td>
+                    <td>@Html.DisplayFor(m => item.UpdatedAt)</td>
+                    <td class="action-buttons">
+                        <a href="/Comic/Details/@item.ComicId" class="btn-view">View</a>
+                        <a asp-action="Edit" asp-route-id="@item.ComicId" class="btn-edit">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.ComicId" class="btn-delete">Delete</a>
+                        <a href="/ManageComics/ManageChapters/?comicId=@item.ComicId" class="btn-chapters">Manage Chapters</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <!-- Pagination -->
 @if (ViewBag.TotalPages > 1)
 {
-    <nav>
+    <nav aria-label="Page navigation">
         <ul class="pagination">
             @if (ViewBag.CurrentPage > 1)
             {
                 <li class="page-item">
-                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(ViewBag.CurrentPage - 1))">Previous</a>
+                    <a class="page-link" href="javascript:void(0);"
+                       onclick="loadPage(@(ViewBag.CurrentPage - 1))">Previous</a>
                 </li>
             }
             @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
             {
-                if (i == (int)ViewBag.CurrentPage)
-                {
-                    <li class="page-item active">
+                <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                    @if (i == (int)ViewBag.CurrentPage)
+                    {
                         <span class="page-link">@i</span>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="javascript:void(0);" onclick="loadPage(@i)">@i</a>
-                    </li>
-                }
+                    }
+                    else
+                    {
+                        <a class="page-link" href="javascript:void(0);"
+                           onclick="loadPage(@i)">@i</a>
+                    }
+                </li>
             }
             @if (ViewBag.CurrentPage < ViewBag.TotalPages)
             {
                 <li class="page-item">
-                    <a class="page-link" href="javascript:void(0);" onclick="loadPage(@(ViewBag.CurrentPage + 1))">Next</a>
+                    <a class="page-link" href="javascript:void(0);"
+                       onclick="loadPage(@(ViewBag.CurrentPage + 1))">Next</a>
                 </li>
             }
         </ul>
