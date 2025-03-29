@@ -88,54 +88,54 @@
                     </div>
                     
                     <!-- Follow/Rate buttons -->
-                    @if (isLoggedIn)
-                    {
-                        <button id="followBtn" 
+                        @if (isLoggedIn)
+                        {
+                                <button id="followBtn" 
                                 class="w-full py-2 rounded-md @(isFollowing ? "bg-pink-100 text-pink-700" : "bg-blue-600 text-white") hover:opacity-90 transition-colors mb-3">
                             <i class="fas @(isFollowing ? "fa-heart" : "fa-heart") mr-1"></i>
                             @(isFollowing ? "Following" : "Follow")
-                        </button>
-                        
+                                </button>
+
                         <div class="mb-4">
                             <div class="flex items-center justify-center" id="ratingStars">
-                                @for (int i = 1; i <= 5; i++)
-                                {
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
                                     <button class="rating-star text-xl mx-1 @(ViewBag.UserRating >= i ? "text-yellow-400" : "text-gray-300")" 
-                                            data-rating="@i">
-                                        <i class="fas fa-star"></i>
-                                    </button>
-                                }
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1 text-center">
-                                @if (ViewBag.UserRating > 0)
-                                {
+                                                        data-rating="@i">
+                                                    <i class="fas fa-star"></i>
+                                                </button>
+                                    }
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1 text-center">
+                                    @if (ViewBag.UserRating > 0)
+                                    {
                                     <span>Your rating: <span id="userRatingText">@ViewBag.UserRating</span>/5</span>
-                                }
-                                else
-                                {
+                                    }
+                                    else
+                                    {
                                     <span id="userRatingText">Rate this comic</span>
-                                }
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Details", "Comic", new { id = Model.ComicId }) })" 
+                                    }
+                                    </p>
+                                </div>
+                        }
+                        else
+                        {
+                                <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Details", "Comic", new { id = Model.ComicId }) })" 
                            class="block w-full py-2 text-center bg-blue-600 text-white rounded-md shadow hover:opacity-90 transition-colors mb-4">
                             <i class="fas fa-sign-in-alt mr-1"></i> Login to follow/rate
-                        </a>
-                    }
-                    
-                    <!-- Description -->
+                                </a>
+                        }
+
+                <!-- Description -->
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900 mb-2">Description</h2>
-                        <div class="prose max-w-none text-gray-700">
-                            @if (string.IsNullOrEmpty(Model.Description))
-                            {
+                    <div class="prose max-w-none text-gray-700">
+                        @if (string.IsNullOrEmpty(Model.Description))
+                        {
                                 <p class="italic text-gray-500">No description available for this comic.</p>
-                            }
-                            else
-                            {
+                        }
+                        else
+                        {
                                 <div class="description-container">
                                     <div class="description-content overflow-hidden transition-all duration-300" style="max-height: 100px;">
                                         <p>@Model.Description</p>
@@ -145,41 +145,41 @@
                                         <i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300"></i>
                                     </button>
                                 </div>
-                            }
+                        }
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Chapters -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-3">Chapters</h2>
-            @if (!Model.Chapters.Any())
-            {
-                <p class="italic text-gray-500">No chapters available yet.</p>
-            }
-            else
-            {
-                <div class="space-y-1">
-                    @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.ChapterNumber))
-                    {
-                        <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" 
-                           class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
-                            <span class="text-blue-600 font-medium">
-                                Chapter @chapter.ChapterNumber
-                                @if (!string.IsNullOrEmpty(chapter.Title))
-                                {
-                                    <span class="text-gray-700 font-normal"> - @chapter.Title</span>
-                                }
-                            </span>
-                            <span class="text-gray-500 text-sm">
-                                @(chapter.CreatedAt.HasValue ? chapter.CreatedAt.Value.ToString("MMM dd, yyyy") : "")
-                            </span>
-                        </a>
-                    }
+                    </div>
                 </div>
-            }
+
+                <!-- Chapters -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Chapters</h2>
+                    @if (!Model.Chapters.Any())
+                    {
+                            <p class="italic text-gray-500">No chapters available yet.</p>
+                    }
+                    else
+                    {
+                            <div class="space-y-1">
+                            @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.ChapterNumber))
+                            {
+                                        <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" 
+                                           class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
+                            <span class="text-blue-600 font-medium">
+                                                Chapter @chapter.ChapterNumber
+                                        @if (!string.IsNullOrEmpty(chapter.Title))
+                                        {
+                                                        <span class="text-gray-700 font-normal"> - @chapter.Title</span>
+                                        }
+                                            </span>
+                                            <span class="text-gray-500 text-sm">
+                                        @(chapter.CreatedAt.HasValue ? chapter.CreatedAt.Value.ToString("MMM dd, yyyy") : "")
+                                            </span>
+                                        </a>
+                            }
+                            </div>
+                    }
         </div>
     </div>
 

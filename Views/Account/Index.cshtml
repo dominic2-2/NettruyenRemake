@@ -1,0 +1,79 @@
+@model IEnumerable<NettruyenRemake.Models.User>
+
+@{
+    ViewData["Title"] = "Accounts List";
+    int? currentUserId = Context.Session.GetInt32("UserId");
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        <a asp-action="Create" class="btn btn-primary">Create New Account</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="@(item.UserId == currentUserId ? "table-info" : "")">
+                                <td>@item.UserId</td>
+                                <td>@item.Username @(item.UserId == currentUserId ? "(You)" : "")</td>
+                                <td>@item.Email</td>
+                                <td>
+                                    <span class="badge @(item.RoleId == 3 ? "bg-danger" : item.RoleId == 2 ? "bg-warning" : "bg-info")">
+                                        @item.Role.RoleName
+                                    </span>
+                                </td>
+                                <td>@item.CreatedAt.ToString()</td>
+                                <td>
+                                    <div class="btn-group">
+                                        @if (item.UserId == currentUserId)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary" disabled title="You cannot edit your own account">Edit</button>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        }
+                                        <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-info">Details</a>
+                                        @if (item.UserId == currentUserId)
+                                        {
+                                            <button class="btn btn-sm btn-outline-secondary" disabled title="You cannot delete your own account">Delete</button>
+                                        }
+                                        else
+                                        {
+                                            <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-danger">Delete</a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 
