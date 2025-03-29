@@ -1,22 +1,80 @@
 ﻿@model NettruyenRemake.Models.Chapter
+@{
+    ViewData["Title"] = $"{Model.Comic.Title} - Chapter {Model.ChapterNumber}";
+    var images = ViewBag.Images as List<string> ?? new();
+}
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đọc Chapter @Model.ChapterNumber - @Model.Comic.Title</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Đọc Chapter @Model.ChapterNumber - @Model.Comic.Title</h1>
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-xl font-semibold mb-2">@(string.IsNullOrEmpty(Model.Title) ? $"Chapter {Model.ChapterNumber}" : Model.Title)</h2>
-            <div class="prose max-w-none">
-                @Html.Raw(Model.Content)
-            </div>
+<!-- Override layout chỉ cho trang này -->
+<style>
+    .chapter-reader-container {
+        max-width: 100vw;
+        padding: 0;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="chapter-reader-container">
+    <!-- Thanh tiêu đề + điều hướng chương -->
+    <div class="sticky top-0 bg-white shadow z-50 px-4 py-3 flex flex-wrap justify-between items-center">
+        <div>
+            @if (ViewBag.PreviousChapter != null)
+            {
+                <a href="@Url.Action("Read", "Chapter", new { id = ViewBag.PreviousChapter.ChapterId })"
+                   class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-3 rounded mr-2">
+                    ← Chapter @ViewBag.PreviousChapter.ChapterNumber
+                </a>
+            }
+        </div>
+
+        <div class="relative">
+            <select onchange="location.href=this.value"
+                    class="text-sm border rounded px-3 py-2 focus:outline-none">
+                @foreach (var chap in ViewBag.ChapterList as List<Chapter>)
+                {
+                    if (chap.ChapterId == Model.ChapterId)
+                    {
+                        <option selected="selected" value="@Url.Action("Read", "Chapter", new { id = chap.ChapterId })">
+                            Chapter @chap.ChapterNumber
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@Url.Action("Read", "Chapter", new { id = chap.ChapterId })">
+                            Chapter @chap.ChapterNumber
+                        </option>
+                    }
+                }
+
+            </select>
+        </div>
+
+        <div>
+            @if (ViewBag.NextChapter != null)
+            {
+                <a href="@Url.Action("Read", "Chapter", new { id = ViewBag.NextChapter.ChapterId })"
+                   class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-3 rounded ml-2">
+                    Chapter @ViewBag.NextChapter.ChapterNumber →
+                </a>
+            }
         </div>
     </div>
-</body>
-</html>
+
+    <!-- Ảnh truyện -->
+    <div class="flex flex-col items-center gap-4 px-2">
+        @foreach (var img in images)
+        {
+            <img src="@Url.Action("ProxyImage", "Comic", new { url = img })"
+                 alt="Page"
+                 class="max-w-full w-auto object-contain"
+                 style="max-height: none;"
+                 onerror="this.src='/images/default-page.jpg'" />
+        }
+    </div>
+
+    <div class="mt-6 text-center pb-10">
+        <a href="@Url.Action("Details", "Comic", new { id = Model.ComicId })"
+           class="text-indigo-600 hover:underline">
+            ← Quay về trang truyện
+        </a>
+    </div>
+</div>
