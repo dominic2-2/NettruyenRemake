@@ -70,7 +70,7 @@ namespace NettruyenRemake.Controllers
             }
             else
             {
-                HttpContext.Session.SetString("UserAvatar", ""); // Store an empty string for no avatar
+                HttpContext.Session.SetString("UserAvatar", "");
             }
 
             return RedirectToAction("Index", "Home");
