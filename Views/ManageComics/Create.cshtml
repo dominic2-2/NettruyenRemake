@@ -1,83 +1,85 @@
 ﻿@model NettruyenRemake.Models.Comic
-
 @{
     ViewData["Title"] = "Tạo truyện mới";
 }
 
-<h2 class="mb-4">📝 Tạo truyện mới</h2>
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">📝 Tạo truyện mới</h2>
 
-<!-- Chọn trang web hỗ trợ leech -->
-<div class="form-group mb-3">
-    <label for="leechSite">Trang hỗ trợ</label>
-    <select id="leechSite" class="form-control">
-        <option value="mangapark.io">mangapark.io</option>
-    </select>
-</div>
-
-<!-- Nhập link cần leech -->
-<div class="form-group mb-3">
-    <label for="metaUrl">URL truyện</label>
-    <input type="text" id="metaUrl" class="form-control" placeholder="https://..." />
-</div>
-
-<!-- Nút lấy dữ liệu -->
-<div class="form-group mb-4">
-    <button type="button" class="btn btn-info" id="fetchMetadataBtn">Lấy dữ liệu</button>
-</div>
-
-<hr />
-
-<!-- Các trường auto-fill -->
-<div class="form-group mb-3">
-    <label asp-for="Title" class="control-label">Tên truyện</label>
-    <input asp-for="Title" class="form-control" id="Title" />
-</div>
-
-<div class="form-group mb-3">
-    <label asp-for="Author" class="control-label">Tác giả</label>
-    <input asp-for="Author" class="form-control" id="Author" />
-</div>
-
-<div class="form-group mb-3">
-    <label asp-for="Description" class="control-label">Mô tả</label>
-    <input asp-for="Description" class="form-control" id="Description" />
-</div>
-
-<div class="form-group mb-3">
-    <label asp-for="ThumbnailUrl" class="control-label">Thumbnail</label>
-    <input asp-for="ThumbnailUrl" class="form-control" id="ThumbnailUrl" />
-</div>
-
-<!-- Ảnh preview -->
-<div class="form-group mb-3">
-    <label>Ảnh preview</label>
-    <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="img-thumbnail" style="max-width: 200px; display: none;" />
-</div>
-
-<!-- Checkboxes thể loại từ DB -->
-<div class="form-group mb-4">
-    <label>Thể loại</label>
-    <div id="categoryContainer" class="form-check">
-        @if (ViewBag.AllCategories != null)
-        {
-            foreach (var cat in ViewBag.AllCategories as List<NettruyenRemake.Models.Category>)
-            {
-                <div class="form-check form-check-inline">
-                    <input type="checkbox"
-                           class="form-check-input"
-                           name="category"
-                           value="@cat.CategoryName"
-                           id="cat_@cat.CategoryId" />
-                    <label class="form-check-label me-3" for="cat_@cat.CategoryId">@cat.CategoryName</label>
-                </div>
-            }
-        }
+    <!-- Chọn trang web hỗ trợ leech -->
+    <div class="mb-6">
+        <label for="leechSite" class="block text-sm font-medium text-gray-700 mb-2">Trang hỗ trợ</label>
+        <select id="leechSite" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="mangapark.io">mangapark.io</option>
+        </select>
     </div>
-</div>
 
-<!-- Nút lưu -->
-<div class="form-group">
-    <button type="button" class="btn btn-success" id="saveComicBtn" disabled>Lưu truyện</button>
+    <!-- Nhập link cần leech -->
+    <div class="mb-6">
+        <label for="metaUrl" class="block text-sm font-medium text-gray-700 mb-2">URL truyện</label>
+        <input type="text" id="metaUrl" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://..." />
+    </div>
+
+    <!-- Nút lấy dữ liệu -->
+    <div class="mb-6">
+        <button type="button" class="btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200" id="fetchMetadataBtn">Lấy dữ liệu</button>
+    </div>
+
+    <hr class="my-6 border-gray-200" />
+
+    <!-- Các trường auto-fill -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="mb-6">
+            <label asp-for="Title" class="block text-sm font-medium text-gray-700 mb-2">Tên truyện</label>
+            <input asp-for="Title" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="Title" />
+        </div>
+
+        <div class="mb-6">
+            <label asp-for="Author" class="block text-sm font-medium text-gray-700 mb-2">Tác giả</label>
+            <input asp-for="Author" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="Author" />
+        </div>
+
+        <div class="mb-6 md:col-span-2">
+            <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+            <input asp-for="Description" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="Description" />
+        </div>
+
+        <div class="mb-6">
+            <label asp-for="ThumbnailUrl" class="block text-sm font-medium text-gray-700 mb-2">Thumbnail</label>
+            <input asp-for="ThumbnailUrl" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="ThumbnailUrl" />
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh preview</label>
+            <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="max-w-[200px] rounded-lg shadow-md hidden" />
+        </div>
+    </div>
+
+    <!-- Checkboxes thể loại từ DB -->
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Thể loại</label>
+        <div id="categoryContainer" class="flex flex-wrap gap-4">
+            @if (ViewBag.AllCategories != null)
+            {
+                foreach (var cat in ViewBag.AllCategories as List<NettruyenRemake.Models.Category> ?? new List<NettruyenRemake.Models.Category>())
+                {
+                    <div class="flex items-center">
+                        <input type="checkbox"
+                               class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                               name="category"
+                               value="@cat.CategoryName"
+                               id="cat_@cat.CategoryId" />
+                        <label class="ml-2 text-sm text-gray-700" for="cat_@cat.CategoryId">@cat.CategoryName</label>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Nút lưu -->
+    <div class="mb-6">
+        <button type="button" class="btn bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed" id="saveComicBtn" disabled>Lưu truyện</button>
+    </div>
 </div>
 
 @section Scripts {

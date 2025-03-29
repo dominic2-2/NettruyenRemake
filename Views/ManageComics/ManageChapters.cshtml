@@ -2,88 +2,90 @@
     ViewData["Title"] = "ManageChapters";
 }
 
-<h1>ManageChapters</h1>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Chapter Management</h1>
 
-<div class="row">
-    <!-- Bên trái: Dữ liệu từ DB -->
-    <div class="col-md-6">
-        <h3>Thông tin truyện</h3>
-        <input type="hidden" id="comicId" value="@ViewBag.Comic.ComicId" />
-        <div class="form-group">
-            <label for="comicId">Truyện</label>
-            <input type="text" class="form-control" value="@ViewBag.Comic.Title" readonly />
-        </div>
-        <div class="form-group">
-            <label>Preview ảnh</label>
-            @if (!string.IsNullOrEmpty(ViewBag.ThumbnailPreview))
-            {
-                <img id="thumbnailPreviewDB" src="data:image/jpeg;base64,@ViewBag.ThumbnailPreview" alt="Thumbnail Preview DB" class="img-thumbnail" style="max-width: 200px;" />
-            }
-            else
-            {
-                <p>No Thumbnail available</p>
-            }
-        </div>
-        <div class="form-group">
-            <label>Danh sách các chương hiện tại</label>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Chương</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody id="chapterListDB">
-                    @foreach (var chapter in ViewBag.Chapters)
-                    {
-                        <tr>
-                            <td>@chapter.Title</td>
-                            <td>
-                                <a href="@chapter.ChapterId" target="_blank" class="btn btn-info">Xem</a>
-                                <button class="btn btn-danger delete-chapter-btn" data-chapterid="@chapter.ChapterId">Xóa</button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Bên phải: Dữ liệu lấy từ Leech Link -->
-    <div class="col-md-6">
-        <h3>Thêm Chương từ Link Metadata</h3>
-        <div class="form-group">
-            <label for="metaUrl">Link metadata chương</label>
-            <input type="text" id="metaUrl" class="form-control" placeholder="https://mangapark.io/..." />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Bên trái: Dữ liệu từ DB -->
+        <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Thông tin truyện</h3>
+            <input type="hidden" id="comicId" value="@ViewBag.Comic.ComicId" />
+            <div class="mb-6">
+                <label for="comicId" class="block text-sm font-medium text-gray-700 mb-2">Truyện</label>
+                <input type="text" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-100" value="@ViewBag.Comic.Title" readonly />
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Preview ảnh</label>
+                @if (!string.IsNullOrEmpty(ViewBag.ThumbnailPreview))
+                {
+                    <img id="thumbnailPreviewDB" src="data:image/jpeg;base64,@ViewBag.ThumbnailPreview" alt="Thumbnail Preview DB" class="max-w-[200px] rounded-lg shadow-md" />
+                }
+                else
+                {
+                    <p class="text-gray-500">No Thumbnail available</p>
+                }
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Danh sách các chương hiện tại</label>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="p-3 text-sm font-semibold text-gray-700">Chương</th>
+                                <th class="p-3 text-sm font-semibold text-gray-700">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chapterListDB" class="divide-y divide-gray-200">
+                            @foreach (var chapter in ViewBag.Chapters)
+                            {
+                                <tr>
+                                    <td class="p-3 text-gray-800">@chapter.Title</td>
+                                    <td class="p-3">
+                                        <a href="/Chapter/Read/@chapter.ChapterId" target="_blank" class="inline-block bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200">Xem</a>
+                                        <button class="inline-block bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-200 delete-chapter-btn" data-chapterid="@chapter.ChapterId">Xóa</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <button type="button" class="btn btn-info" id="fetchChapterDataBtn">Lấy dữ liệu chương</button>
-        </div>
-
-        <hr />
-
-        <div class="form-group">
-            <label>Tên truyện</label>
-            <input type="text" id="chapterTitle" class="form-control" readonly />
-        </div>
-        <div class="form-group">
-            <label>Preview ảnh</label>
-            <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="img-thumbnail" style="max-width: 200px; display: none;" />
-        </div>
-
-        <div class="form-group">
-            <label>Danh sách các chương</label>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Chương</th>
-                        <th>Link</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody id="chapterList"></tbody>
-            </table>
+        <!-- Bên phải: Dữ liệu lấy từ Leech Link -->
+        <div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Thêm Chương từ Link Metadata</h3>
+            <div class="mb-6">
+                <label for="metaUrl" class="block text-sm font-medium text-gray-700 mb-2">Link metadata chương</label>
+                <input type="text" id="metaUrl" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://mangapark.io/..." />
+            </div>
+            <div class="mb-6">
+                <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200" id="fetchChapterDataBtn">Lấy dữ liệu chương</button>
+            </div>
+            <hr class="my-6 border-gray-200" />
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tên truyện</label>
+                <input type="text" id="chapterTitle" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-100" readonly />
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Preview ảnh</label>
+                <img id="thumbnailPreview" src="" alt="Thumbnail Preview" class="max-w-[200px] rounded-lg shadow-md hidden" />
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Danh sách các chương</label>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="p-3 text-sm font-semibold text-gray-700">Chương</th>
+                                <th class="p-3 text-sm font-semibold text-gray-700">Link</th>
+                                <th class="p-3 text-sm font-semibold text-gray-700">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chapterList" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -112,9 +114,9 @@
                     data.chapters.forEach(function (chapter) {
                         $('#chapterList').append(`
                             <tr>
-                                <td>${chapter.title}</td>
-                                <td><a href="${chapter.link}" target="_blank">${chapter.link}</a></td>
-                                <td><button class="btn btn-primary add-chapter-btn" data-title="${chapter.title}" data-link="${chapter.link}">Add</button></td>
+                                <td class="p-3 text-gray-800">${chapter.title}</td>
+                                <td class="p-3"><a href="${chapter.link}" target="_blank" class="text-blue-500 hover:underline">${chapter.link}</a></td>
+                                <td class="p-3"><button class="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200 add-chapter-btn" data-title="${chapter.title}" data-link="${chapter.link}">Add</button></td>
                             </tr>
                         `);
                     });
@@ -139,10 +141,10 @@
                     const chapterId = res.chapterId;
                     $('#chapterListDB').prepend(`
                         <tr>
-                            <td>${chapterTitle}</td>
-                            <td>
-                                <a href="#" target="_blank" class="btn btn-info">Xem</a>
-                                <button class="btn btn-danger delete-chapter-btn" data-chapterid="${chapterId}">Xóa</button>
+                            <td class="p-3 text-gray-800">${chapterTitle}</td>
+                            <td class="p-3">
+                                <a href="/Chapter/Read/${chapterId}" target="_blank" class="inline-block bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200">Xem</a>
+                                <button class="inline-block bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition duration-200 delete-chapter-btn" data-chapterid="${chapterId}">Xóa</button>
                             </td>
                         </tr>
                     `);
@@ -171,6 +173,5 @@
                 });
             }
         });
-
     </script>
 }
