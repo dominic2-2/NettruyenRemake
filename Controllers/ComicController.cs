@@ -19,7 +19,7 @@ namespace NettruyenRemake.Controllers
         }
 
 
-        public async Task<IActionResult> ListAll(string keyword = "", string sort = "newest", int categoryId = 0)
+        public async Task<IActionResult> ListAll(string keyword = "", string sort = "newest", List<int> categoryIds = null)
         {
             var comicsQuery = _context.Comics
                 .Include(c => c.Status)
@@ -37,9 +37,10 @@ namespace NettruyenRemake.Controllers
                     c.Author.ToLower().Contains(keyword));
             }
 
-            if (categoryId > 0)
+            if (categoryIds != null && categoryIds.Any())
             {
-                comicsQuery = comicsQuery.Where(c => c.Categories.Any(cat => cat.CategoryId == categoryId));
+                comicsQuery = comicsQuery
+                    .Where(c => categoryIds.All(cid => c.Categories.Select(cat => cat.CategoryId).Contains(cid)));
             }
 
             comicsQuery = sort switch
@@ -53,7 +54,7 @@ namespace NettruyenRemake.Controllers
 
             ViewBag.Categories = await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync();
             ViewBag.Sort = sort;
-            ViewBag.CategoryId = categoryId;
+            ViewBag.SelectedCategoryIds = categoryIds ?? new List<int>();
             ViewBag.Keyword = keyword;
 
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
