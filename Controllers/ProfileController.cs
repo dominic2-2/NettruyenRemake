@@ -80,7 +80,7 @@
         int? userId = HttpContext.Session.GetInt32("UserId");
         if (userId == null)
         {
-            return File("~/images/default-avatar.jpg", "image/jpeg");
+            return File("~/img/default-avatar.png", "image/jpeg");
         }
 
         var user = _context.Users.Find(userId);
@@ -88,6 +88,6 @@
         {
             return File(user.Avatar, "image/jpeg");
         }
-        return File("~/images/default-avatar.jpg", "image/jpeg");
+        return File("~/img/default-avatar.png", "image/jpeg");
     }
 }
