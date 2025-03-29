@@ -35,9 +35,37 @@ namespace NettruyenRemake.Controllers
 
             return View(comics);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetThumbnail(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                // Trả về 1 ảnh mặc định nếu url rỗng
+                var fallbackBytes = System.IO.File.ReadAllBytes("wwwroot/images/default.png");
+                return File(fallbackBytes, "image/png");
+            }
+
+            var bytes = await ImageHelper.DownloadImageAsync(url);
+            // Nếu download bị lỗi, ImageHelper trả về fallback, ta cứ trả thẳng fallback
+            return File(bytes, "image/jpeg");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetThumbnailPreview(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return NotFound();
+            }
+
+            var imageBytes = await ImageHelper.DownloadImageAsync(url);
+            // Nếu bạn biết chắc ảnh là JPEG, có thể dùng "image/jpeg".
+            // Nếu không, bạn có thể xác định MIME type từ URL hoặc để mặc định.
+            return File(imageBytes, "image/jpeg");
+        }
+
 
         // GET: ManageComics/LoadComicsPartial/
-        public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 1)
+        public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 4)
         {
             int totalComics = await _context.Comics.CountAsync();
             int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
@@ -74,7 +102,6 @@ namespace NettruyenRemake.Controllers
             return View(comic);
         }
 
-        // POST: ManageComics/Edit/5
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ComicId,Title,Description,Author,StatusId,ThumbnailUrl")] Comic comic)
@@ -84,14 +111,13 @@ namespace NettruyenRemake.Controllers
                 return NotFound();
             }
 
-            // Xóa bỏ các trường không bind hoặc gây lỗi, bao gồm navigation property "Status"
+            // Loại bỏ các trường không bind hoặc gây lỗi
             ModelState.Remove("CreatedAt");
             ModelState.Remove("UpdatedAt");
-            ModelState.Remove("Status"); // Loại bỏ lỗi validate của thuộc tính Status
+            ModelState.Remove("Status");
 
             if (!ModelState.IsValid)
             {
-                // Load lại dropdown nếu validation fail
                 ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusName", comic.StatusId);
                 return View(comic);
             }
@@ -106,9 +132,18 @@ namespace NettruyenRemake.Controllers
             comicToUpdate.Title = comic.Title;
             comicToUpdate.Description = comic.Description;
             comicToUpdate.Author = comic.Author;
-            comicToUpdate.ThumbnailUrl = comic.ThumbnailUrl;
-            comicToUpdate.StatusId = comic.StatusId; // Giá trị từ dropdown
+            comicToUpdate.StatusId = comic.StatusId;
             comicToUpdate.UpdatedAt = DateTime.Now;
+
+            // Xử lý thay thế Thumbnail bằng URL ảnh mới nếu được nhập
+            // Lấy giá trị từ trường newThumbnailUrl trong form
+            string newThumbnailUrl = Request.Form["newThumbnailUrl"].ToString();
+            if (!string.IsNullOrEmpty(newThumbnailUrl))
+            {
+                // Nếu người dùng nhập URL mới, cập nhật vào DB
+                comicToUpdate.ThumbnailUrl = newThumbnailUrl;
+            }
+            // Nếu newThumbnailUrl rỗng, không thay đổi giá trị cũ (comicToUpdate.ThumbnailUrl giữ nguyên)
 
             try
             {
@@ -128,6 +163,7 @@ namespace NettruyenRemake.Controllers
                 }
             }
         }
+
 
 
         // GET: ManageComics/Delete/5

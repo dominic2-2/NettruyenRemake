@@ -1,63 +1,142 @@
 ﻿@model NettruyenRemake.Models.Comic
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Comic";
 }
 
-<h1>Delete</h1>
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-danger text-white">
+            <h2 class="mb-0">Delete Comic</h2>
+        </div>
+        <div class="card-body">
+            <h4 class="text-danger mb-4">Are you sure you want to delete this?</h4>
+            <h5 class="card-title">Comic Details</h5>
+            <hr />
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Comic</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Author)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Author)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ThumbnailUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ThumbnailUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status.StatusId)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="ComicId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+            <dl class="row mb-4">
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.Title)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Title)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.Author)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Author)
+                </dd>
+
+                <!-- ĐỔI TÊN HIỂN THỊ Ở DÒNG DƯỚI: ThumbnailUrl => Image -->
+                <dt class="col-sm-3 fw-bold text-muted">
+                    Image
+                </dt>
+                <dd class="col-sm-10 text-wrap text-break">
+                    @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                    {
+                        <img src="@Url.Action("GetThumbnailPreview", "ManageComics", new { url = Model.ThumbnailUrl })"
+                             alt="Image" class="img-fluid rounded shadow-sm" style="max-height: 100px;" />
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(model => model.ThumbnailUrl)
+                    }
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.CreatedAt)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CreatedAt)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.UpdatedAt)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.UpdatedAt)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.Status)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Status.StatusName)
+                </dd>
+            </dl>
+
+            <form asp-action="Delete" class="d-flex justify-content-between align-items-center">
+                <input type="hidden" asp-for="ComicId" />
+                <input type="submit" value="Delete" class="btn btn-danger px-4" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            </form>
+        </div>
+    </div>
 </div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 1.5rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .fw-bold {
+        font-weight: 600;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #b02a37;
+            border-color: #b02a37;
+        }
+
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+    img {
+        transition: transform 0.3s ease;
+    }
+
+        img:hover {
+            transform: scale(1.05);
+        }
+</style>

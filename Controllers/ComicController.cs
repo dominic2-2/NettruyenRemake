@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using NettruyenRemake.Helpers;
 
 namespace NettruyenRemake.Controllers
 {
@@ -146,12 +147,14 @@ namespace NettruyenRemake.Controllers
                 return RedirectToAction("Login", "Authen");
             }
 
-            // Get all comics that the user is following
+            // Get all comics that the user is following, ordered by follow date (newest first)
             var followedComics = await _context.Comics
                 .Include(c => c.Status)
                 .Include(c => c.ComicStat)
                 .Include(c => c.Chapters)
+                .Include(c => c.Follows.Where(f => f.UserId == userId)) // Include the follows for ordering
                 .Where(c => c.Follows.Any(f => f.UserId == userId))
+                .OrderByDescending(c => c.Follows.FirstOrDefault(f => f.UserId == userId).FollowedAt) // Order by follow date
                 .AsSplitQuery()
                 .ToListAsync();
 
@@ -328,6 +331,46 @@ namespace NettruyenRemake.Controllers
             return Json(new { success = true, rating = userRating });
         }
 
+        
+        [HttpGet]
+        [Route("comic/image")]
+        public async Task<IActionResult> GetComicImage(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                return NotFound();
+            }
+
+            try
+            {
+               
+                url = Uri.UnescapeDataString(url);
+                
+              
+                var imageBytes = await ImageHelper.DownloadImageAsync(url);
+                
+                if (imageBytes == null || imageBytes.Length == 0)
+                {
+                    return NotFound();
+                }
+                
+                // Determine content type based on URL extension
+                string contentType = "image/jpeg"; // Default
+                if (url.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                    contentType = "image/png";
+                else if (url.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+                    contentType = "image/gif";
+                else if (url.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+                    contentType = "image/webp";
+                
+                return File(imageBytes, contentType);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error proxying image: {ex.Message}");
+                return NotFound();
+            }
+        }
 
         [HttpGet("/proxy-image")]
         public async Task<IActionResult> ProxyImage(string url)
