@@ -1,6 +1,8 @@
 ﻿@{
+    @using NettruyenRemake.Helpers
     var userAvatar = Context.Session.GetString("UserAvatar");
     var userName = Context.Session.GetString("UserName");
+    int? userId = Context.Session.GetInt32("UserId");
 }
 
 <!DOCTYPE html>
@@ -55,11 +57,9 @@
                                      tabindex="0"
                                      class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none p-3 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
                                     <div class="grid place-items-center mr-4">
-                                        @if (!string.IsNullOrEmpty(userAvatar))
-                                        {
-                                            <img src="@userAvatar"
-                                                 class="inline-block relative object-cover object-center !rounded-full w-9 h-9 rounded-md" />
-                                        }
+                                        <img src="@Url.Action("Avatar", "Profile")"
+                                             class="inline-block relative object-cover object-center !rounded-full w-9 h-9 rounded-md" />
+                                        
 
 
                                     </div>
@@ -83,12 +83,11 @@
                                 <div class="overflow-hidden" style="height: 0px">
                                     <div class="block w-full py-4 text-gray-700 antialiased font-sans text-sm font-light leading-normal py-1">
                                         <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700 p-0">
-                                            <div role="button"
-                                                 data-ripple-dark="true"
-                                                 tabindex="0"
-                                                 class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                            <a href="@Url.Action("Edit", "Profile")"
+                                               class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 data-[selected=true]:text-gray-900">
+                                                <i class="fas fa-user mr-2"></i>
                                                 My Profile
-                                            </div>
+                                            </a>
                                             <a href="@Url.Action("History", "Chapter")"
                                                class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 data-[selected=true]:text-gray-900">
                                                 <i class="fas fa-book-open mr-2 text-blue-500"></i>
@@ -100,12 +99,28 @@
                                                 <i class="fas fa-heart mr-2 text-pink-500"></i>
                                                 My Follows
                                             </a>
-                                            <div role="button"
-                                                 data-ripple-dark="true"
-                                                 tabindex="0"
-                                                 class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                                                Settings
-                                            </div>
+                                            <a asp-action="Logout" asp-controller="Authen">
+                                                <div role="button"
+                                                     data-ripple-dark="true"
+                                                     tabindex="0"
+                                                     class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
+                                                    <div class="grid place-items-center mr-4">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                             fill="none"
+                                                             viewBox="0 0 24 24"
+                                                             stroke-width="2.5"
+                                                             stroke="currentColor"
+                                                             aria-hidden="true"
+                                                             data-slot="icon"
+                                                             class="h-5 w-5">
+                                                            <path stroke-linecap="round"
+                                                                  stroke-linejoin="round"
+                                                                  d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"></path>
+                                                        </svg>
+                                                    </div>
+                                                    Sign Out
+                                                </div>
+                                            </a>
                                         </nav>
                                     </div>
                                 </div>
@@ -162,46 +177,16 @@
                                              class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-12 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
                                             Sales
                                         </div>
+                                        <a href="@Url.Action("Index", "Category")"
+                                           class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 data-[selected=true]:text-gray-900">
+                                           
+                                            View Categories
+                                        </a>
                                     </nav>
                                 </div>
                             </div>
                         </div>
-                        <div role="button"
-                             data-ripple-dark="true"
-                             tabindex="0"
-                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                            <div class="grid place-items-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     viewBox="0 0 24 24"
-                                     fill="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
-                                     class="h-5 w-5">
-                                    <path d="M16.5 6a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z"
-                                          clip-rule="evenodd"></path>
-                                    <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z"></path>
-                                </svg>
-                            </div>
-                            Products
-                        </div>
-                        <div role="button"
-                             data-ripple-dark="true"
-                             tabindex="0"
-                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                            <div class="grid place-items-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     viewBox="0 0 24 24"
-                                     fill="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
-                                     class="h-5 w-5">
-                                    <path fill-rule="evenodd"
-                                          d="M1.5 6.375c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v3.026a.75.75 0 0 1-.375.65 2.249 2.249 0 0 0 0 3.898.75.75 0 0 1 .375.65v3.026c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 0 1 1.5 17.625v-3.026a.75.75 0 0 1 .374-.65 2.249 2.249 0 0 0 0-3.898.75.75 0 0 1-.374-.65V6.375Zm15-1.125a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0V6a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0v.75a.75.75 0 0 0 1.5 0v-.75Zm-.75 3a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-1.5 0v-.75a.75.75 0 0 1 .75-.75Zm.75 4.5a.75.75 0 0 0-1.5 0V18a.75.75 0 0 0 1.5 0v-.75ZM6 12a.75.75 0 0 1 .75-.75H12a.75.75 0 0 1 0 1.5H6.75A.75.75 0 0 1 6 12Zm.75 2.25a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"
-                                          clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            Orders
-                        </div>
+                        
                         <div role="button"
                              data-ripple-dark="true"
                              tabindex="0"
@@ -219,53 +204,10 @@
                                     <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z"></path>
                                 </svg>
                             </div>
-                            Customers
+                            Accounts
                         </div>
-                        <div role="button"
-                             data-ripple-dark="true"
-                             tabindex="0"
-                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-3 py-[9px] select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                            <div class="grid place-items-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     viewBox="0 0 24 24"
-                                     fill="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
-                                     class="h-5 w-5">
-                                    <path fill-rule="evenodd"
-                                          d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM8.25 12a.75.75 0 01.75-.75h6a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zm-.75-3.75a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5H7.5a.75.75 0 01-.75-.75zm-.75 7.5a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5H7.5a.75.75 0 01-.75-.75z"
-                                          clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <p class="block antialiased font-sans text-base font-light leading-relaxed text-inherit mr-auto font-normal text-inherit">
-                                Management
-                            </p>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke-width="3"
-                                 stroke="currentColor"
-                                 aria-hidden="true"
-                                 data-slot="icon"
-                                 class="ml-auto h-4 w-4 text-gray-500 transition-transform">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="m19.5 8.25-7.5 7.5-7.5-7.5"></path>
-                            </svg>
-                        </div>
-                        <div class="overflow-hidden" style="height: 0px">
-                            <div class="block w-full py-4 text-gray-700 antialiased font-sans text-sm font-light leading-normal py-1">
-                                <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700 p-0">
-                                    <a href="@Url.Action("Index", "ManageComics")"
-                                       role="button"
-                                       data-ripple-dark="true"
-                                       tabindex="0"
-                                       class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-12 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                                        Manage Comic
-                                    </a>
-                                </nav>
-                            </div>
-                        </div>
+                       
+                       
                         <div role="button"
                              data-ripple-dark="true"
                              tabindex="0"
@@ -282,72 +224,11 @@
                                           clip-rule="evenodd"></path>
                                 </svg>
                             </div>
-                            <a href="@Url.Action("ListAll", "Comic")" class="block w-full">Comics</a>
+                            <a href="@Url.Action("Index", "ManageComics")" class="block w-full">Comics</a>
                         </div>
-                        @if (!string.IsNullOrEmpty(Context.Session.GetString("UserName")))
-                        {
-                            <div class="block relative w-full">
-                                <div data-selected="false"
-                                     role="button"
-                                     data-ripple-dark="true"
-                                     tabindex="0"
-                                     class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-3 py-[9px] select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                                    <div class="grid place-items-center mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                             viewBox="0 0 24 24"
-                                             fill="currentColor"
-                                             aria-hidden="true"
-                                             data-slot="icon"
-                                             class="h-5 w-5">
-                                            <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-                                        </svg>
-                                    </div>
-                                    <a href="@Url.Action("MyFollowings", "Comic")" class="block w-full">My Follows</a>
-                                </div>
-                            </div>
-                        }
+                       
                     </nav>
-                    <hr class="my-2 border-gray-200" />
-                    <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
-                        <div role="button"
-                             data-ripple-dark="true"
-                             tabindex="0"
-                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                            <div class="grid place-items-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     viewBox="0 0 24 24"
-                                     fill="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
-                                     class="h-5 w-5">
-                                    <path fill-rule="evenodd"
-                                          d="M12 2.25c-2.429 0-4.817.178-7.152.521C2.87 3.061 1.5 4.795 1.5 6.741v6.018c0 1.946 1.37 3.68 3.348 3.97.877.129 1.761.234 2.652.316V21a.75.75 0 0 0 1.28.53l4.184-4.183a.39.39 0 0 1 .266-.112c2.006-.05 3.982-.22 5.922-.506 1.978-.29 3.348-2.023 3.348-3.97V6.741c0-1.947-1.37-3.68-3.348-3.97A49.145 49.145 0 0 0 12 2.25ZM8.25 8.625a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25Zm2.625 1.125a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Zm4.875-1.125a1.125 1.125 0 1 0 0 2.25 1.125 1.125 0 0 0 0-2.25Z"
-                                          clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            Help &amp; Support
-                        </div>
-                        <div role="button"
-                             data-ripple-dark="true"
-                             tabindex="0"
-                             class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
-                            <div class="grid place-items-center mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke-width="2.5"
-                                     stroke="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
-                                     class="h-5 w-5">
-                                    <path stroke-linecap="round"
-                                          stroke-linejoin="round"
-                                          d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"></path>
-                                </svg>
-                            </div>
-                            Sign Out
-                        </div>
-                    </nav>
+                   
                 </div>
             </div>
         </aside>
@@ -380,15 +261,21 @@
                                 <span class="pointer-events-none mx-2 text-slate-800">
                                     /
                                 </span>
-                            </li>
                             <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
-                                <a href="@Url.Action("History", "Chapter")">Components</a>
-                                <span class="pointer-events-none mx-2 text-slate-800">
-                                    /
-                                </span>
-                            </li>
-                            <li class="flex cursor-pointer items-center text-sm text-slate-500 transition-colors duration-300 hover:text-slate-800">
-                                <a href="#">Breadcrumbs</a>
+                                <ol class="flex items-center whitespace-nowrap">
+                                        @foreach (var item in BreadcrumbHelper.GetBreadcrumbs(ViewContext))
+                                        {
+                                        <li class="inline-flex items-center">
+                                                @if (!item.Title.Equals("Home"))
+                                                {
+                                                <span class="pointer-events-none mx-2 text-slate-800">/</span>
+                                                }
+                                            <a href="@Url.Action(item.Action, item.Controller)" class="hover:text-slate-800">
+                                                    @item.Title
+                                            </a>
+                                        </li>
+                                        }
+                                </ol>
                             </li>
                         </ol>
                     </nav>
