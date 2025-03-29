@@ -22,19 +22,25 @@ namespace NettruyenRemake.Controllers
         }
 
         // GET: ManageComics
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
+            int pageSize = 10; // Mỗi trang hiển thị 10 comic
+            int totalComics = await _context.Comics.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+
             var comics = await _context.Comics
                 .Include(c => c.Status)
+                .OrderBy(c => c.ComicId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-
-            // Giả sử pageSize = 10
-            int totalPages = (int)Math.Ceiling(comics.Count() / 10.0);
-            ViewBag.TotalPages = totalPages;
-            ViewBag.CurrentPage = 1;
 
             return View(comics);
         }
+
+
         [HttpGet]
         public async Task<IActionResult> GetThumbnail(string url)
         {
@@ -65,7 +71,7 @@ namespace NettruyenRemake.Controllers
 
 
         // GET: ManageComics/LoadComicsPartial/
-        public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 4)
+        public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 10)
         {
             int totalComics = await _context.Comics.CountAsync();
             int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
@@ -86,12 +92,21 @@ namespace NettruyenRemake.Controllers
         // GET: ManageComics/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+                return NotFound();
 
-            var comic = await _context.Comics.FindAsync(id);
-            if (comic == null) return NotFound();
+            // Nạp comic kèm Categories
+            var comic = await _context.Comics
+                .Include(c => c.Categories)
+                .FirstOrDefaultAsync(c => c.ComicId == id);
+            if (comic == null)
+                return NotFound();
 
-            // Tạo dropdown: Value = StatusId, Text = StatusName, SelectedValue = comic.StatusId
+            // Lấy danh sách tất cả category
+            var allCategories = await _context.Categories.ToListAsync();
+            ViewBag.AllCategories = allCategories;
+
+            // Nạp dropdown Status
             ViewData["StatusId"] = new SelectList(
                 _context.ComicStatuses,
                 "StatusId",
@@ -101,6 +116,7 @@ namespace NettruyenRemake.Controllers
 
             return View(comic);
         }
+
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
@@ -119,31 +135,53 @@ namespace NettruyenRemake.Controllers
             if (!ModelState.IsValid)
             {
                 ViewData["StatusId"] = new SelectList(_context.ComicStatuses, "StatusId", "StatusName", comic.StatusId);
+                ViewBag.AllCategories = await _context.Categories.ToListAsync();
                 return View(comic);
             }
 
-            var comicToUpdate = await _context.Comics.FindAsync(id);
+            // Tìm comic gốc cùng với danh sách Categories
+            var comicToUpdate = await _context.Comics
+                .Include(c => c.Categories)
+                .FirstOrDefaultAsync(c => c.ComicId == id);
             if (comicToUpdate == null)
             {
                 return NotFound();
             }
 
-            // Cập nhật các trường cho phép
+            // Cập nhật các trường cơ bản
             comicToUpdate.Title = comic.Title;
             comicToUpdate.Description = comic.Description;
             comicToUpdate.Author = comic.Author;
             comicToUpdate.StatusId = comic.StatusId;
             comicToUpdate.UpdatedAt = DateTime.Now;
 
-            // Xử lý thay thế Thumbnail bằng URL ảnh mới nếu được nhập
-            // Lấy giá trị từ trường newThumbnailUrl trong form
+            // Xử lý thay thế Thumbnail bằng URL ảnh mới (nếu có)
             string newThumbnailUrl = Request.Form["newThumbnailUrl"].ToString();
             if (!string.IsNullOrEmpty(newThumbnailUrl))
             {
-                // Nếu người dùng nhập URL mới, cập nhật vào DB
                 comicToUpdate.ThumbnailUrl = newThumbnailUrl;
             }
-            // Nếu newThumbnailUrl rỗng, không thay đổi giá trị cũ (comicToUpdate.ThumbnailUrl giữ nguyên)
+            // Nếu không nhập, giữ nguyên giá trị cũ
+
+            // Xử lý Category:
+            // 1. Xóa hết các Category cũ
+            comicToUpdate.Categories.Clear();
+            // 2. Lấy danh sách CategoryIds được gửi từ form (checkbox có name="CategoryIds")
+            var selectedCatIds = Request.Form["CategoryIds"];
+            if (selectedCatIds.Count > 0)
+            {
+                // Chuyển các giá trị sang int
+                var catIds = selectedCatIds.Select(idStr => int.Parse(idStr)).ToList();
+                // Lấy danh sách Category tương ứng từ DB
+                var categoriesToAdd = await _context.Categories
+                    .Where(cat => catIds.Contains(cat.CategoryId))
+                    .ToListAsync();
+
+                foreach (var cat in categoriesToAdd)
+                {
+                    comicToUpdate.Categories.Add(cat);
+                }
+            }
 
             try
             {
@@ -163,6 +201,7 @@ namespace NettruyenRemake.Controllers
                 }
             }
         }
+
 
 
 
