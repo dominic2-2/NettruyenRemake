@@ -39,7 +39,8 @@
 
                 <div class="bg-white rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })" class="block">
-                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "/images/default-comic.jpg" : comic.ThumbnailUrl)"
+                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "/images/default-comic.jpg" : 
+                                  (comic.ThumbnailUrl.StartsWith("http") ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl }) : comic.ThumbnailUrl))"
                              class="w-full h-64 object-cover"
                              alt="@comic.Title" />
                     </a>

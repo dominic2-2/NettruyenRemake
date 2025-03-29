@@ -23,152 +23,163 @@
     <script src="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/scripts/script.js"></script>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .comic-cover {
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            width: 230px;
+            max-width: 100%;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-6">
-        <div class="flex flex-col md:flex-row gap-8">
-            <!-- Comic Cover and Follow Button -->
-            <div class="md:w-1/3">
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/default-comic.jpg" : Model.ThumbnailUrl)" 
-                         class="w-full h-auto object-cover" alt="@Model.Title">
-
-                    <div class="p-4">
-                        @if (isLoggedIn)
-                        {
-                                <button id="followBtn" 
-                                        class="w-full py-3 rounded-md @(isFollowing ? "bg-pink-100 text-pink-700" : "bg-gray-100 text-gray-700") hover:bg-pink-200 transition-colors">
-                                    <i class="fas @(isFollowing ? "fa-heart" : "fa-heart") mr-2"></i>
-                                @(isFollowing ? "Following" : "Follow This Comic")
-                                </button>
-
-                                <!-- Star rating UI moved here, below the follow button -->
-                                <div class="mt-4">
-                                    <div class="flex items-center space-x-1 justify-center" id="ratingStars">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                                <button class="rating-star text-xl @(ViewBag.UserRating >= i ? "text-yellow-400" : "text-gray-300")" 
-                                                        data-rating="@i">
-                                                    <i class="fas fa-star"></i>
-                                                </button>
-                                    }
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-1 text-center">
-                                    @if (ViewBag.UserRating > 0)
-                                    {
-                                                <span>Your rating: <span id="userRatingText">@ViewBag.UserRating</span></span>
-                                    }
-                                    else
-                                    {
-                                                <span id="userRatingText">Click to rate</span>
-                                    }
-                                    </p>
-                                </div>
-                        }
-                        else
-                        {
-                                <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Details", "Comic", new { id = Model.ComicId }) })" 
-                                   class="block w-full py-3 text-center bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition-colors">
-                                    <i class="fas fa-sign-in-alt mr-2"></i> Login to Follow
-                                </a>
-                        }
-
-                        <!-- Comic Stats -->
-                        <div class="mt-4 space-y-2">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-700">Status:</span>
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">@Model.Status.StatusName</span>
-                            </div>
-
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-700">Views:</span>
-                                <span id="viewCount" class="font-medium">@(Model.ComicStat?.ViewCount?.ToString("N0") ?? "0")</span>
-                            </div>
-
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-700">Follows:</span>
-                                <span id="followCount" class="font-medium">@(Model.ComicStat?.FollowCount?.ToString("N0") ?? "0")</span>
-                            </div>
-
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-700">Comments:</span>
-                                <span class="font-medium">@(Model.ComicStat?.CommentCount?.ToString("N0") ?? "0")</span>
-                            </div>
-
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-700">Author:</span>
-                                <span class="font-medium">@(Model.Author ?? "Unknown")</span>
-                            </div>
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Main comic info card -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
+            <div class="flex flex-row">
+                <!-- Left side: Comic cover image with fixed width -->
+                <div class="w-[230px] flex-shrink-0 p-3">
+                    <img src="@(string.IsNullOrEmpty(Model.ThumbnailUrl) ? "/images/default-comic.jpg" : 
+                             (Model.ThumbnailUrl.StartsWith("http") ? Url.Action("GetComicImage", "Comic", new { url = Model.ThumbnailUrl }) : Model.ThumbnailUrl))" 
+                         class="comic-cover rounded-md" alt="@Model.Title">
+                </div>
+                
+                <!-- Right side: All comic info -->
+                <div class="flex-1 p-5">
+                    <!-- Title at the top -->
+                    <h1 class="text-2xl font-bold text-gray-900 mb-3">@Model.Title</h1>
+                    
+                    <!-- Status and meta info -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1">Status: <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">@Model.Status.StatusName</span></div>
+                            
                         </div>
-
-                        <!-- Add this inside your comic stats section -->
-                        <div class="flex items-center text-yellow-500 mb-2">
-                            <i class="fas fa-star mr-1"></i>
-                            <span id="avgRating">@ViewBag.AverageRating</span>
-                            <span class="text-gray-500 text-sm ml-1">(@ViewBag.RatingCount ratings)</span>
+                        
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1">Author: @(Model.Author ?? "Unknown") </div>
+                            @* <div></div> *@
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Comic Details and Chapters -->
-            <div class="md:w-2/3">
-                <h1 class="text-3xl font-bold text-gray-900 mb-4">@Model.Title</h1>
-
-                <!-- Description -->
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Description</h2>
-                    <div class="prose max-w-none text-gray-700">
-                        @if (string.IsNullOrEmpty(Model.Description))
-                        {
+                    
+                    <!-- Stats with icons -->
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-5 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-eye text-gray-600 w-5"></i>
+                            <span id="viewCount" class="font-medium">Views: @(Model.ComicStat?.ViewCount?.ToString("N0") ?? "0")</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-heart text-pink-500 w-5"></i>
+                            <span id="followCount" class="font-medium">Follow: @(Model.ComicStat?.FollowCount?.ToString("N0") ?? "0")</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-comment text-blue-500 w-5"></i>
+                            <span class="font-medium">Comment: @(Model.ComicStat?.CommentCount?.ToString("N0") ?? "0")</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-500 w-5"></i>
+                            <span id="avgRating" class="font-medium">Rating: @ViewBag.AverageRating</span>
+                            <span class="text-xs text-gray-500 ml-1">(@ViewBag.RatingCount)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Follow/Rate buttons -->
+                    @if (isLoggedIn)
+                    {
+                        <button id="followBtn" 
+                                class="w-full py-2 rounded-md @(isFollowing ? "bg-pink-100 text-pink-700" : "bg-blue-600 text-white") hover:opacity-90 transition-colors mb-3">
+                            <i class="fas @(isFollowing ? "fa-heart" : "fa-heart") mr-1"></i>
+                            @(isFollowing ? "Following" : "Follow")
+                        </button>
+                        
+                        <div class="mb-4">
+                            <div class="flex items-center justify-center" id="ratingStars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <button class="rating-star text-xl mx-1 @(ViewBag.UserRating >= i ? "text-yellow-400" : "text-gray-300")" 
+                                            data-rating="@i">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                }
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 text-center">
+                                @if (ViewBag.UserRating > 0)
+                                {
+                                    <span>Your rating: <span id="userRatingText">@ViewBag.UserRating</span>/5</span>
+                                }
+                                else
+                                {
+                                    <span id="userRatingText">Rate this comic</span>
+                                }
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Details", "Comic", new { id = Model.ComicId }) })" 
+                           class="block w-full py-2 text-center bg-blue-600 text-white rounded-md shadow hover:opacity-90 transition-colors mb-4">
+                            <i class="fas fa-sign-in-alt mr-1"></i> Login to follow/rate
+                        </a>
+                    }
+                    
+                    <!-- Description -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-2">Description</h2>
+                        <div class="prose max-w-none text-gray-700">
+                            @if (string.IsNullOrEmpty(Model.Description))
+                            {
                                 <p class="italic text-gray-500">No description available for this comic.</p>
-                        }
-                        else
-                        {
+                            }
+                            else
+                            {
                                 <div class="description-container">
                                     <div class="description-content overflow-hidden transition-all duration-300" style="max-height: 100px;">
                                         <p>@Model.Description</p>
                                     </div>
-                                    <button id="description-toggle" class="mt-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
+                                    <button id="description-toggle" class="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
                                         <span>Show More</span>
                                         <i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300"></i>
                                     </button>
                                 </div>
-                        }
+                            }
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Chapters -->
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Chapters</h2>
-                    @if (!Model.Chapters.Any())
+        <!-- Chapters -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-3">Chapters</h2>
+            @if (!Model.Chapters.Any())
+            {
+                <p class="italic text-gray-500">No chapters available yet.</p>
+            }
+            else
+            {
+                <div class="space-y-1">
+                    @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.ChapterNumber))
                     {
-                            <p class="italic text-gray-500">No chapters available yet.</p>
-                    }
-                    else
-                    {
-                            <div class="space-y-1">
-                            @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.ChapterNumber))
-                            {
-                                        <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" 
-                                           class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
-                                            <span class="text-indigo-600 font-medium">
-                                                Chapter @chapter.ChapterNumber
-                                        @if (!string.IsNullOrEmpty(chapter.Title))
-                                        {
-                                                        <span class="text-gray-700 font-normal"> - @chapter.Title</span>
-                                        }
-                                            </span>
-                                            <span class="text-gray-500 text-sm">
-                                        @(chapter.CreatedAt.HasValue ? chapter.CreatedAt.Value.ToString("MMM dd, yyyy") : "")
-                                            </span>
-                                        </a>
-                            }
-                            </div>
+                        <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" 
+                           class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
+                            <span class="text-blue-600 font-medium">
+                                Chapter @chapter.ChapterNumber
+                                @if (!string.IsNullOrEmpty(chapter.Title))
+                                {
+                                    <span class="text-gray-700 font-normal"> - @chapter.Title</span>
+                                }
+                            </span>
+                            <span class="text-gray-500 text-sm">
+                                @(chapter.CreatedAt.HasValue ? chapter.CreatedAt.Value.ToString("MMM dd, yyyy") : "")
+                            </span>
+                        </a>
                     }
                 </div>
-            </div>
+            }
         </div>
     </div>
 
@@ -197,15 +208,15 @@
                         if (response.following) {
                             // Update to "following" state
                             btn.html('<i class="fas fa-heart mr-2"></i> Following');
-                            btn.removeClass('bg-gray-100 text-gray-700').addClass('bg-pink-100 text-pink-700');
+                            btn.removeClass('bg-blue-600 text-white').addClass('bg-pink-100 text-pink-700');
 
                             // Update follow count
                             var currentCount = parseInt($('#followCount').text().replace(/,/g, ''));
                             $('#followCount').text((currentCount + 1).toLocaleString());
                         } else {
                             // Update to "not following" state
-                            btn.html('<i class="fas fa-heart mr-2"></i> Follow This Comic');
-                            btn.removeClass('bg-pink-100 text-pink-700').addClass('bg-gray-100 text-gray-700');
+                            btn.html('<i class="fas fa-heart mr-2"></i> Follow');
+                            btn.removeClass('bg-pink-100 text-pink-700').addClass('bg-blue-600 text-white');
 
                             // Update follow count
                             var currentCount = parseInt($('#followCount').text().replace(/,/g, ''));
@@ -320,7 +331,5 @@
         updateStarDisplay(initialRating);
     });
     </script>
-
-
 </body>
 </html> 
