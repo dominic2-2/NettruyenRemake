@@ -327,5 +327,23 @@ namespace NettruyenRemake.Controllers
 
             return Json(new { success = true, rating = userRating });
         }
+
+
+        [HttpGet("/proxy-image")]
+        public async Task<IActionResult> ProxyImage(string url)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                var imageBytes = await httpClient.GetByteArrayAsync(url);
+                return File(imageBytes, "image/jpeg");
+            }
+            catch
+            {
+                var fallbackPath = Path.Combine("wwwroot", "images", "default-thumbnail.jpg");
+                var fallbackBytes = await System.IO.File.ReadAllBytesAsync(fallbackPath);
+                return File(fallbackBytes, "image/jpeg");
+            }
+        }
     }
 }
