@@ -39,6 +39,8 @@ CREATE TABLE comics (
     thumbnail_url NVARCHAR(255),
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE(),
+    created_by INT NULL,
+    FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL,
 	FOREIGN KEY (status_id) REFERENCES comic_status(status_id)
 );
 

@@ -21,6 +21,8 @@ public partial class Comic
 
     public DateTime? UpdatedAt { get; set; }
 
+    public int? CreatedBy { get; set; }
+
     public virtual ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();
 
     public virtual ICollection<ComicComment> ComicComments { get; set; } = new List<ComicComment>();
@@ -36,4 +38,6 @@ public partial class Comic
     public virtual ComicStatus Status { get; set; } = null!;
 
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    public virtual User? CreatedByUser { get; set; }
 }

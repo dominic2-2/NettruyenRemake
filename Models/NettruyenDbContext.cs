@@ -125,6 +125,7 @@ public partial class NettruyenDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.StatusId)
                 .HasDefaultValue(1)
@@ -161,6 +162,10 @@ public partial class NettruyenDbContext : DbContext
                         j.IndexerProperty<int>("ComicId").HasColumnName("comic_id");
                         j.IndexerProperty<int>("CategoryId").HasColumnName("category_id");
                     });
+            entity.HasOne(d => d.CreatedByUser).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_comics_users_created_by");
         });
 
         modelBuilder.Entity<ComicComment>(entity =>

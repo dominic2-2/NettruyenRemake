@@ -24,22 +24,39 @@ namespace NettruyenRemake.Controllers
         // GET: ManageComics
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10; // Mỗi trang hiển thị 10 comic
-            int totalComics = await _context.Comics.CountAsync();
+            int pageSize = 10;
+
+            int? userRole = HttpContext.Session.GetInt32("UserRole");
+            int? userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userRole == null || userId == null)
+            {
+                return RedirectToAction("Login", "Authen");
+            }
+
+            // Query chung
+            IQueryable<Comic> query = _context.Comics
+                .Include(c => c.Status)
+                .OrderBy(c => c.ComicId);
+
+            if (userRole == 2)
+            {
+                query = query.Where(c => c.CreatedBy == userId);
+            }
+
+            int totalComics = await query.CountAsync();
             int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
             ViewBag.TotalPages = totalPages;
             ViewBag.CurrentPage = page;
 
-            var comics = await _context.Comics
-                .Include(c => c.Status)
-                .OrderBy(c => c.ComicId)
+            // 💡 Chỉ thực hiện truy vấn một lần
+            var comics = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             return View(comics);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetThumbnail(string url)
@@ -73,18 +90,33 @@ namespace NettruyenRemake.Controllers
         // GET: ManageComics/LoadComicsPartial/
         public async Task<IActionResult> LoadComicsPartial(int page = 1, int pageSize = 10)
         {
-            int totalComics = await _context.Comics.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
+            int? userRole = HttpContext.Session.GetInt32("UserRole");
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
-            var comics = await _context.Comics
+            if (userRole == null || userId == null)
+            {
+                return Unauthorized(); // hoặc trả về PartialView thông báo lỗi
+            }
+
+            // Truy vấn comics theo quyền
+            IQueryable<Comic> query = _context.Comics
                 .Include(c => c.Status)
-                .OrderBy(c => c.ComicId)
+                .OrderBy(c => c.ComicId);
+
+            if (userRole == 2) // Nếu là author thì chỉ thấy truyện của mình
+            {
+                query = query.Where(c => c.CreatedBy == userId);
+            }
+
+            int totalComics = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+
+            var comics = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-
-            ViewBag.TotalPages = totalPages;
-            ViewBag.CurrentPage = page;
 
             return PartialView("_ComicListPartial", comics);
         }
@@ -322,9 +354,11 @@ namespace NettruyenRemake.Controllers
         public async Task<IActionResult> SaveComic([FromForm] Comic comic, [FromForm] string Categories)
         {
             ModelState.Remove("Status");
+            int? userId = HttpContext.Session.GetInt32("UserId");
 
             if (ModelState.IsValid)
             {
+                comic.CreatedBy = userId;
                 comic.CreatedAt = DateTime.Now;
                 comic.UpdatedAt = DateTime.Now;
                 _context.Comics.Add(comic);
