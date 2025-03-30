@@ -19,7 +19,7 @@ namespace NettruyenRemake.Controllers
         }
 
 
-        public async Task<IActionResult> ListAll(string keyword = "", string sort = "newest", List<int> categoryIds = null)
+        public async Task<IActionResult> ListAll(string keyword = "", string sort = "newest", List<int> categoryIds = null, int page = 1, int pageSize = 24)
         {
             var comicsQuery = _context.Comics
                 .Include(c => c.Status)
@@ -29,6 +29,7 @@ namespace NettruyenRemake.Controllers
                 .AsSplitQuery()
                 .AsQueryable();
 
+            // Tìm kiếm theo từ khóa
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 keyword = keyword.Trim().ToLower();
@@ -37,26 +38,42 @@ namespace NettruyenRemake.Controllers
                     c.Author.ToLower().Contains(keyword));
             }
 
+            // Lọc theo thể loại
             if (categoryIds != null && categoryIds.Any())
             {
                 comicsQuery = comicsQuery
                     .Where(c => categoryIds.All(cid => c.Categories.Select(cat => cat.CategoryId).Contains(cid)));
             }
 
+            // Sắp xếp
             comicsQuery = sort switch
             {
                 "views" => comicsQuery.OrderByDescending(c => c.ComicStat.ViewCount),
                 "likes" => comicsQuery.OrderByDescending(c => c.ComicStat.FollowCount),
-                _ => comicsQuery.OrderByDescending(c => c.UpdatedAt),
+                "recent" => comicsQuery.OrderByDescending(c => c.Chapters.Max(ch => ch.CreatedAt)),
+                _ => comicsQuery.OrderByDescending(c => c.UpdatedAt)
             };
 
-            var comics = await comicsQuery.ToListAsync();
 
+            // Tính tổng và áp dụng phân trang
+            var totalComics = await comicsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
+
+            var comics = await comicsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Dữ liệu cho dropdown lọc
             ViewBag.Categories = await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync();
             ViewBag.Sort = sort;
             ViewBag.SelectedCategoryIds = categoryIds ?? new List<int>();
             ViewBag.Keyword = keyword;
 
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            // Dữ liệu follow & rating
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
 
             ViewBag.FollowedComicIds = userId > 0
@@ -79,10 +96,10 @@ namespace NettruyenRemake.Controllers
 
             ViewBag.ComicRatings = comicRatings;
             ViewBag.ComicRatingCounts = comicRatingCounts;
-            ViewBag.Keyword = keyword;
 
             return View(comics);
         }
+
 
 
         // Get comic details

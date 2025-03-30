@@ -14,12 +14,15 @@
         <!-- Sắp xếp -->
         <div class="flex items-center gap-2">
             <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Sắp xếp:</label>
-            <select name="sort" class="w-full max-w-[150px] border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <select name="sort" class="w-full max-w-[180px] border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="newest" selected="@(ViewBag.Sort == "newest")">🕒 Mới đăng</option>
                 <option value="views" selected="@(ViewBag.Sort == "views")">👁️ Lượt đọc</option>
                 <option value="likes" selected="@(ViewBag.Sort == "likes")">❤️ Lượt thích</option>
+                <option value="recent" selected="@(ViewBag.Sort == "recent")">🆕 Mới cập nhật chương</option>
             </select>
         </div>
+
+        
 
         <!-- Thể loại -->
         <div class="flex items-center gap-2 flex-1 min-w-[300px]">
@@ -47,6 +50,7 @@
             <h1 class="text-3xl font-bold text-gray-900">Browse Comics</h1>
         </div>
 
+        <!-- Danh sách truyện -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach (var comic in Model)
             {
@@ -54,7 +58,9 @@
                 <div class="bg-white rounded-lg overflow-hidden shadow-md transition-transform hover:scale-105 hover:shadow-lg">
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })" class="block">
                         <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "/images/default-comic.jpg" :
-                                  (comic.ThumbnailUrl.StartsWith("http") ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl }) : comic.ThumbnailUrl))"
+                            (comic.ThumbnailUrl.StartsWith("http")
+                                ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl })
+                                : comic.ThumbnailUrl))"
                              class="w-full h-64 object-cover"
                              alt="@comic.Title" />
                     </a>
@@ -129,7 +135,31 @@
                     }
                 </div>
             }
-        </div>
+        </div> <!-- Kết thúc grid -->
+        <!-- Phân trang -->
+        @if ((int)ViewBag.TotalPages > 1)
+        {
+            <div class="mt-10 flex justify-center gap-2 flex-wrap">
+                @{
+                    var selectedCategoryIds = ViewBag.SelectedCategoryIds as List<int> ?? new List<int>();
+                    var updatedWithin = ViewBag.UpdatedWithin as string ?? "";
+                }
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    var query = $"?keyword={ViewBag.Keyword}&sort={ViewBag.Sort}&updatedWithin={updatedWithin}&page={i}";
+                    foreach (var catId in selectedCategoryIds)
+                    {
+                        query += $"&categoryIds={catId}";
+                    }
+
+                    <a href="@Url.Action("ListAll", "Comic")@query"
+                       class="px-4 py-2 rounded-md border text-sm font-medium transition-all duration-200 @(i == ViewBag.CurrentPage ? "bg-indigo-600 text-white" : "bg-white text-gray-700 hover:bg-gray-100")">
+                        @i
+                    </a>
+                }
+            </div>
+        }
+
     </div>
 </div>
 
