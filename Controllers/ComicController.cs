@@ -138,10 +138,7 @@ namespace NettruyenRemake.Controllers
             ViewBag.AverageRating = Math.Round(averageRating, 1);
 
             // Get rating count
-            var ratingCount = await _context.Ratings
-                .Where(r => r.ComicId == id)
-                .CountAsync();
-            ViewBag.RatingCount = ratingCount;
+            ViewBag.RatingCount = comic.ComicStat?.RatingCount ?? 0;
 
             ViewBag.IsFollowing = isFollowing;
 
@@ -279,6 +276,7 @@ namespace NettruyenRemake.Controllers
             }
         }
 
+
         [HttpPost]
         public async Task<IActionResult> RateComic(int comicId, int rating)
         {
@@ -302,6 +300,8 @@ namespace NettruyenRemake.Controllers
                 var existingRating = await _context.Ratings
                     .FirstOrDefaultAsync(r => r.UserId == userId && r.ComicId == comicId);
 
+                var comicStat = await _context.ComicStats.FirstOrDefaultAsync(cs => cs.ComicId == comicId);
+
                 if (existingRating != null)
                 {
                     // Update existing rating
@@ -320,6 +320,13 @@ namespace NettruyenRemake.Controllers
                     };
 
                     _context.Ratings.Add(newRating);
+
+                    // Increment rating count in comic stats for new ratings
+                    if (comicStat != null)
+                    {
+                        comicStat.RatingCount = (comicStat.RatingCount ?? 0) + 1;
+                        comicStat.LastUpdated = DateTime.Now;
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -329,9 +336,8 @@ namespace NettruyenRemake.Controllers
                     .Where(r => r.ComicId == comicId)
                     .AverageAsync(r => r.RatingValue) ?? 0;
 
-                var ratingCount = await _context.Ratings
-                    .Where(r => r.ComicId == comicId)
-                    .CountAsync();
+                // Get rating count from comic_stats
+                var ratingCount = comicStat?.RatingCount ?? 0;
 
                 return Json(new
                 {
@@ -347,7 +353,6 @@ namespace NettruyenRemake.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
         [HttpGet]
         public async Task<IActionResult> GetUserRating(int comicId)
         {
