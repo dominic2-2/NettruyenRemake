@@ -13,18 +13,28 @@
     <div class="container mx-auto p-6">
         
         <br />
-        <!-- 🔥 Top 5 Truyện Được Xem Nhiều Nhất -->
-        <h2 class="text-2xl font-bold text-red-600 mb-4">🔥 Truyện Được Xem Nhiều Nhất</h2>
+        <!-- Header có tiêu đề và nút xem tất cả nằm trên cùng một dòng -->
+        <div class="flex items-center justify-between mb-4 mt-10">
+            <h2 class="text-2xl font-bold text-red-600">🔥 Truyện Được Xem Nhiều Nhất</h2>
+            <a href="https://localhost:7101/Comic/ListAll?keyword=&sort=newest"
+               class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                Xem tất cả →
+            </a>
+        </div>
+
+        <!-- Grid hiển thị danh sách truyện -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
             @foreach (var comic in topViewed)
             {
                 var latestChapter = comic.Chapters?.OrderByDescending(c => c.ChapterNumber).FirstOrDefault();
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
 
-                    <!-- Bọc ảnh bằng link tới chi tiết -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "https://via.placeholder.com/150x200" : 
-                                  (comic.ThumbnailUrl.StartsWith("http") ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl }) : comic.ThumbnailUrl))"
+                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl)
+                            ? "https://via.placeholder.com/150x200"
+                            : (comic.ThumbnailUrl.StartsWith("http")
+                                ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl })
+                                : comic.ThumbnailUrl))"
                              alt="@comic.Title"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
@@ -32,14 +42,12 @@
                     </a>
 
                     <div class="p-4">
-                        <!-- Bọc tiêu đề bằng link tới chi tiết -->
                         <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
                             <h3 class="text-lg font-bold truncate hover:text-red-600 transition-colors">
                                 @comic.Title
                             </h3>
                         </a>
 
-                        @* <p class="text-sm text-gray-600">👁️ @comic.ComicStat?.ViewCount?.ToString("N0") lượt xem</p> *@
                         <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p>
                         <p class="text-sm text-gray-600">Trạng thái: @(comic.Status?.StatusName ?? "Không rõ")</p>
 
@@ -55,6 +63,7 @@
             }
         </div>
 
+
         @{
             var latestUpdated = ViewBag.LatestUpdated as List<NettruyenRemake.Models.Comic>;
             var currentPage = ViewBag.CurrentPage as int? ?? 1;
@@ -64,7 +73,14 @@
         @if (latestUpdated != null && latestUpdated.Any())
         {
             <div class="container mx-auto px-4 py-6">
-                <h2 class="text-2xl font-bold mb-4">📚 Truyện mới cập nhật</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">📚 Truyện mới cập nhật</h2>
+
+                    <a href="https://localhost:7101/Comic/ListAll?keyword=&sort=recent"
+                       class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                        Xem tất cả →
+                    </a>
+                </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     @foreach (var comic in latestUpdated)
@@ -106,11 +122,8 @@
                                 </ul>
                             </div>
                         </div>
-
                     }
-
                 </div>
-
                 <div class="flex justify-center items-center mt-6 space-x-2">
                     @for (int i = 1; i <= totalPages; i++)
                     {
@@ -133,7 +146,6 @@
             var topRated = ViewBag.TopRated as List<NettruyenRemake.Models.Comic>;
         }
 
-        <!-- 💗 Top 5 Truyện Được Theo Dõi Nhiều Nhất -->
         <!-- 💗 Top 5 Truyện Được Theo Dõi Nhiều Nhất -->
         <h2 class="text-2xl font-bold text-pink-600 mb-4 mt-10">💗 Truyện Được Theo Dõi Nhiều Nhất</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -161,7 +173,7 @@
                         </a>
 
                         <p class="text-sm text-gray-600">💗 @comic.ComicStat?.FollowCount?.ToString("N0") theo dõi</p>
-                        <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p>
+                        @* <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p> *@
 
                         @if (latest != null)
                         {

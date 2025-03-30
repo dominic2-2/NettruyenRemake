@@ -519,7 +519,7 @@ namespace NettruyenRemake.Controllers
                 .ToList();
 
             // Tìm index của "whb"
-            int whbIndex = list.FindIndex(s => s == "whb");
+            int whbIndex = list.FindIndex(s => s == "whb" || s == "bwh");
             if (whbIndex == -1)
                 return JsonSerializer.Serialize(new { error = "Không tìm thấy 'whb' trong mảng." });
 
