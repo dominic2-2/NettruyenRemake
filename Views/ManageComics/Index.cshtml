@@ -83,7 +83,7 @@
             $.ajax({
                 url: '/ManageComics/LoadComicsPartial',
                 type: 'GET',
-                data: { page: page, pageSize: 4 },
+                data: { page: page, pageSize: 7},
                 success: function (data) {
                     $('#comicsContainer').html(data);
                     $('#comicsContainer .loading-overlay').hide();

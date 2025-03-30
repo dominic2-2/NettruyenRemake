@@ -19,34 +19,50 @@ namespace NettruyenRemake.Controllers
         }
 
 
-        public async Task<IActionResult> ListAll()
+        public async Task<IActionResult> ListAll(string keyword = "", string sort = "newest", List<int> categoryIds = null)
         {
-            var comics = await _context.Comics
+            var comicsQuery = _context.Comics
                 .Include(c => c.Status)
                 .Include(c => c.ComicStat)
+                .Include(c => c.Categories)
                 .Include(c => c.Chapters.OrderByDescending(c => c.ChapterNumber).Take(3))
                 .AsSplitQuery()
-                .ToListAsync();
+                .AsQueryable();
 
-            // Get user ID from session
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.Trim().ToLower();
+                comicsQuery = comicsQuery.Where(c =>
+                    c.Title.ToLower().Contains(keyword) ||
+                    c.Author.ToLower().Contains(keyword));
+            }
+
+            if (categoryIds != null && categoryIds.Any())
+            {
+                comicsQuery = comicsQuery
+                    .Where(c => categoryIds.All(cid => c.Categories.Select(cat => cat.CategoryId).Contains(cid)));
+            }
+
+            comicsQuery = sort switch
+            {
+                "views" => comicsQuery.OrderByDescending(c => c.ComicStat.ViewCount),
+                "likes" => comicsQuery.OrderByDescending(c => c.ComicStat.FollowCount),
+                _ => comicsQuery.OrderByDescending(c => c.UpdatedAt),
+            };
+
+            var comics = await comicsQuery.ToListAsync();
+
+            ViewBag.Categories = await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync();
+            ViewBag.Sort = sort;
+            ViewBag.SelectedCategoryIds = categoryIds ?? new List<int>();
+            ViewBag.Keyword = keyword;
+
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
 
-            if (userId > 0)
-            {
-                // Get all comic IDs that the user is following
-                var followedComicIds = await _context.Follows
-                    .Where(f => f.UserId == userId)
-                    .Select(f => f.ComicId)
-                    .ToListAsync();
+            ViewBag.FollowedComicIds = userId > 0
+                ? await _context.Follows.Where(f => f.UserId == userId).Select(f => f.ComicId).ToListAsync()
+                : new List<int>();
 
-                ViewBag.FollowedComicIds = followedComicIds;
-            }
-            else
-            {
-                ViewBag.FollowedComicIds = new List<int>();
-            }
-
-            // Calculate average ratings for each comic
             var comicRatings = new Dictionary<int, double>();
             var comicRatingCounts = new Dictionary<int, int>();
 
@@ -63,9 +79,11 @@ namespace NettruyenRemake.Controllers
 
             ViewBag.ComicRatings = comicRatings;
             ViewBag.ComicRatingCounts = comicRatingCounts;
+            ViewBag.Keyword = keyword;
 
             return View(comics);
         }
+
 
         // Get comic details
         public async Task<IActionResult> Details(int id)
