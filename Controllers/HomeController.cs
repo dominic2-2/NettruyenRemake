@@ -55,32 +55,35 @@ namespace NettruyenRemake.Controllers
                 .Select(cs => cs.Comic)
                 .ToListAsync();
 
-            var top5Followed = await _context.ComicStats
-                .Include(cs => cs.Comic).ThenInclude(c => c.Status)
-                .Include(cs => cs.Comic).ThenInclude(c => c.Chapters)
-                .Include(cs => cs.Comic).ThenInclude(c => c.Categories)
-                .OrderByDescending(cs => cs.FollowCount)
+            var top5Followed = await _context.Comics
+                .Include(c => c.ComicStat)
+                .Include(c => c.Status)
+                .Include(c => c.Chapters)
+                .Include(c => c.Categories)
+                .OrderByDescending(c => c.ComicStat.FollowCount)
                 .Take(5)
-                .Select(cs => cs.Comic)
                 .ToListAsync();
 
-            var top5Commented = await _context.ComicStats
-                .Include(cs => cs.Comic).ThenInclude(c => c.Chapters)
-                .Include(cs => cs.Comic).ThenInclude(c => c.Categories)
-                .Include(cs => cs.Comic).ThenInclude(c => c.Status)
-                .OrderByDescending(cs => cs.CommentCount)
+
+            var top5Commented = await _context.Comics
+                .Include(c => c.ComicStat)
+                .Include(c => c.Status)
+                .Include(c => c.Categories)
+                .Include(c => c.Chapters)
+                .OrderByDescending(c => c.ComicStat.CommentCount)
                 .Take(5)
-                .Select(cs => cs.Comic)
                 .ToListAsync();
 
-            var top5Rated = await _context.ComicStats
-                .Include(cs => cs.Comic).ThenInclude(c => c.Status)
-                .Include(cs => cs.Comic).ThenInclude(c => c.Categories)
-                .Include(cs => cs.Comic).ThenInclude(c => c.Chapters)
-                .OrderByDescending(cs => cs.RatingCount)
+
+            var top5Rated = await _context.Comics
+                .Include(c => c.ComicStat)
+                .Include(c => c.Status)
+                .Include(c => c.Categories)
+                .Include(c => c.Chapters)
+                .OrderByDescending(c => c.ComicStat.RatingCount)
                 .Take(5)
-                .Select(cs => cs.Comic)
                 .ToListAsync();
+
 
             var totalComics = await _context.Chapters
                 .Select(c => c.ComicId)

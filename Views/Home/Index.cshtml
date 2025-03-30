@@ -134,7 +134,6 @@
         }
 
         <!-- 💗 Top 5 Truyện Được Theo Dõi Nhiều Nhất -->
-        <!-- 💗 Top 5 Truyện Được Theo Dõi Nhiều Nhất -->
         <h2 class="text-2xl font-bold text-pink-600 mb-4 mt-10">💗 Truyện Được Theo Dõi Nhiều Nhất</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             @foreach (var comic in topFollowed)
@@ -161,7 +160,7 @@
                         </a>
 
                         <p class="text-sm text-gray-600">💗 @comic.ComicStat?.FollowCount?.ToString("N0") theo dõi</p>
-                        <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p>
+                        @* <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p> *@
 
                         @if (latest != null)
                         {
