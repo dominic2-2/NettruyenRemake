@@ -194,32 +194,34 @@
                         $('#chapterCommentContent').val('');
 
                         // Create and add the new comment HTML
-            var newComment = `
-                <div class="comment-item border-b border-gray-200 pb-4" id="comment-${response.commentId}">
-                    <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden mr-3">
-                        ${response.userAvatar ?
-                          `<img src="data:image/png;base64,${response.userAvatar}" alt="Avatar" class="w-full h-full object-cover">` :
-                          `<div class="w-full h-full flex items-center justify-center bg-blue-500 text-white">
-                             ${response.username.charAt(0)}
-                           </div>`
-                        }
-                    </div>
-                    <div>
-                        <div class="font-medium text-gray-800">${response.username}</div>
-                        <div class="text-xs text-gray-500">${response.createdAt}</div>
-                    </div>
-                </div>
-                <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm"
-                        data-comment-id="${response.commentId}"
-                        data-comment-type="chapter">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-            <div class="pl-13 ml-13">
-                <p class="text-gray-700">${response.content}</p>
-            </div>
-        </div>
-    `;
+                        var newComment = `
+                            <div class="comment-item border-b border-gray-200 pb-4" id="comment-${response.commentId}">
+                                <div class="flex items-center mb-2 justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden mr-3">
+                                            ${response.userAvatar ?
+                                              `<img src="data:image/png;base64,${response.userAvatar}" alt="Avatar" class="w-full h-full object-cover">` :
+                                              `<div class="w-full h-full flex items-center justify-center bg-blue-500 text-white">
+                                                 ${response.username.charAt(0)}
+                                               </div>`
+                                            }
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-gray-800">${response.username}</div>
+                                            <div class="text-xs text-gray-500">${response.createdAt}</div>
+                                        </div>
+                                    </div>
+                                    <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm"
+                                            data-comment-id="${response.commentId}"
+                                            data-comment-type="chapter">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                <div class="pl-13 ml-13">
+                                    <p class="text-gray-700">${response.content}</p>
+                                </div>
+                            </div>
+                        `;
 
                         // Check if no comments message exists and remove it
                         if ($('#chapterCommentsList .italic').length) {
@@ -248,65 +250,60 @@
                 }
             });
         });
-            $(document).on('click', '.delete-comment-btn', function() {
-        if (!confirm('Are you sure you want to delete this comment?')) {
-            return;
-        }
 
-        var btn = $(this);
-        var commentId = btn.data('comment-id');
-        var commentType = btn.data('comment-type');
-        var commentItem = btn.closest('.comment-item');
-
-        $.ajax({
-            url: commentType === 'comic'
-                ? '@Url.Action("DeleteComment", "Comic")'
-                : '@Url.Action("DeleteChapterComment", "Chapter")',
-            type: 'POST',
-            data: { commentId: commentId },
-            success: function(response) {
-                if (response.success) {
-                    // Remove the comment from DOM
-                    commentItem.fadeOut(300, function() {
-                        $(this).remove();
-
-                        // If no comments left, show the "no comments" message
-                        var commentsList = commentType === 'comic' ? $('#commentsList') : $('#chapterCommentsList');
-                        if (commentsList.children().length === 0) {
-                            var noCommentsMessage = `
-                                <div class="text-gray-500 italic text-center py-6">
-                                    No comments yet. Be the first to share your thoughts!
-                                </div>
-                            `;
-                            commentsList.html(noCommentsMessage);
-                        }
-
-                        // Update comment count in section heading
-                        var commentHeading = $('.bg-white.rounded-lg.shadow-lg.p-6.mt-6 h2');
-                        var currentText = commentHeading.text();
-                        var matches = currentText.match(/Comments \((\d+)\)/);
-                        if (matches && matches.length > 1) {
-                            var count = Math.max(0, parseInt(matches[1]) - 1);
-                            commentHeading.text('Comments (' + count + ')');
-                        }
-
-                        // Update comment count in stats section if on comic details page
-                        if (commentType === 'comic') {
-                            var statText = $('.fas.fa-comment').next().text();
-                            var statCount = parseInt(statText.replace(/Comment: |,/g, '')) || 0;
-                            $('.fas.fa-comment').next().text('Comment: ' + Math.max(0, statCount - 1).toLocaleString());
-                        }
-                    });
-                } else {
-                    alert(response.message || 'Failed to delete comment. Please try again.');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.log("Response:", xhr.responseText);
-                alert('Failed to delete comment. Please try again.');
+        // Handle comment deletion
+        $(document).on('click', '.delete-comment-btn', function() {
+            if (!confirm('Are you sure you want to delete this comment?')) {
+                return;
             }
+
+            var btn = $(this);
+            var commentId = btn.data('comment-id');
+            var commentType = btn.data('comment-type');
+            var commentItem = btn.closest('.comment-item');
+
+            $.ajax({
+                url: commentType === 'comic'
+                    ? '@Url.Action("DeleteComment", "Comic")'
+                    : '@Url.Action("DeleteChapterComment", "Chapter")',
+                type: 'POST',
+                data: { commentId: commentId },
+                success: function(response) {
+                    if (response.success) {
+                        // Remove the comment from DOM
+                        commentItem.fadeOut(300, function() {
+                            $(this).remove();
+
+                            // If no comments left, show the "no comments" message
+                            var commentsList = commentType === 'comic' ? $('#commentsList') : $('#chapterCommentsList');
+                            if (commentsList.children().length === 0) {
+                                var noCommentsMessage = `
+                                    <div class="text-gray-500 italic text-center py-6">
+                                        No comments yet. Be the first to share your thoughts!
+                                    </div>
+                                `;
+                                commentsList.html(noCommentsMessage);
+                            }
+
+                            // Update comment count in section heading
+                            var commentHeading = $('.bg-white.rounded-lg.shadow-lg.p-6.mt-6 h2');
+                            var currentText = commentHeading.text();
+                            var matches = currentText.match(/Comments \((\d+)\)/);
+                            if (matches && matches.length > 1) {
+                                var count = Math.max(0, parseInt(matches[1]) - 1);
+                                commentHeading.text('Comments (' + count + ')');
+                            }
+                        });
+                    } else {
+                        alert(response.message || 'Failed to delete comment. Please try again.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                    console.log("Response:", xhr.responseText);
+                    alert('Failed to delete comment. Please try again.');
+                }
+            });
         });
-    });
     });
 </script>
