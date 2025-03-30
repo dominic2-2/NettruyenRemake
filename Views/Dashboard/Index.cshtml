@@ -1,0 +1,219 @@
+﻿@model DashboardViewModel
+@foreach (var comic in Model.MostCommentedComics)
+{
+    <div>@comic.Title - @comic.TotalComments comments</div>
+}
+
+<div class="container-fluid">
+    <!-- System Overview -->
+    <div class="row mb-4">
+        <h2>📊 System Overview</h2>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">User Registrations</div>
+                <div class="card-body">
+                    <canvas id="userRegistrationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">User Roles</div>
+                <div class="card-body">
+                    <canvas id="roleDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comic Insights -->
+    <div class="row mb-4">
+        <h2>📚 Comic Insights</h2>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Top Viewed Comics</div>
+                <div class="card-body">
+                    <canvas id="topViewedChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Top Followed Comics</div>
+                <div class="card-body">
+                    <canvas id="topFollowedChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Most Commented Comics</div>
+                <div class="card-body">
+                    <canvas id="mostCommentedChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Interaction -->
+    <div class="row mb-4">
+        <h2>⭐ User Interaction</h2>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Rating Activity</div>
+                <div class="card-body">
+                    <canvas id="ratingActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Comment Activity</div>
+                <div class="card-body">
+                    <canvas id="commentActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reading Behavior -->
+    <div class="row mb-4">
+        <h2>🧠 Reading Behavior</h2>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Reading Activity</div>
+                <div class="card-body">
+                    <canvas id="readingActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Peak Reading Hours</div>
+                <div class="card-body">
+                    <canvas id="peakHoursChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // System Overview Charts
+        new Chart(document.getElementById('userRegistrationsChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.UserRegistrations.Select(d => d.Date.ToString("MMM dd")))),
+                datasets: [{
+                    label: 'Registrations',
+                    data: @Html.Raw(Json.Serialize(Model.UserRegistrations.Select(d => d.Count))),
+                    borderColor: '#3e95cd',
+                    fill: false
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('roleDistributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.RoleDistributions.Select(r => r.RoleName))),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.RoleDistributions.Select(r => r.Count))),
+                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+                }]
+            }
+        });
+
+        // Comic Insights Charts
+        new Chart(document.getElementById('topViewedChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.TopViewedComics.Select(c => c.Comic.Title))),
+                datasets: [{
+                    label: 'Views',
+                    data: @Html.Raw(Json.Serialize(Model.TopViewedComics.Select(c => c.ViewCount))),
+                    backgroundColor: '#4caf50'
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('topFollowedChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.TopFollowedComics.Select(c => c.Comic.Title))),
+                datasets: [{
+                    label: 'Follows',
+                    data: @Html.Raw(Json.Serialize(Model.TopFollowedComics.Select(c => c.FollowCount))),
+                    backgroundColor: '#9c27b0'
+                }]
+            }
+        });
+
+                new Chart(document.getElementById('mostCommentedChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.MostCommentedComics.Select(c => c.Title))),
+                datasets: [{
+                    label: 'Comments',
+                    data: @Html.Raw(Json.Serialize(Model.MostCommentedComics.Select(c => c.TotalComments))),
+                    backgroundColor: '#ff9800'
+                }]
+            }
+        });
+
+        // User Interaction Charts
+        new Chart(document.getElementById('ratingActivityChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.RatingActivity.Select(d => d.Date.ToString("MMM dd")))),
+                datasets: [{
+                    label: 'Ratings',
+                    data: @Html.Raw(Json.Serialize(Model.RatingActivity.Select(d => d.Count))),
+                    borderColor: '#e91e63',
+                    fill: false
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('commentActivityChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.CommentActivity.Select(d => d.Date.ToString("MMM dd")))),
+                datasets: [{
+                    label: 'Comments',
+                    data: @Html.Raw(Json.Serialize(Model.CommentActivity.Select(d => d.Count))),
+                    borderColor: '#00bcd4',
+                    fill: false
+                }]
+            }
+        });
+
+        // Reading Behavior Charts
+        new Chart(document.getElementById('readingActivityChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.ReadingActivity.Select(d => d.Date.ToString("MMM dd")))),
+                datasets: [{
+                    label: 'Reads',
+                    data: @Html.Raw(Json.Serialize(Model.ReadingActivity.Select(d => d.ReadCount))),
+                    borderColor: '#8bc34a',
+                    fill: false
+                }]
+            }
+        });
+
+        new Chart(document.getElementById('peakHoursChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.ReadingPeakHours.Select(h => h.Hour + ":00"))),
+                datasets: [{
+                    label: 'Reads',
+                    data: @Html.Raw(Json.Serialize(Model.ReadingPeakHours.Select(h => h.ReadCount))),
+                    backgroundColor: '#ff5722'
+                }]
+            }
+        });
+    </script>
+}
