@@ -2,6 +2,10 @@
 @{
     ViewData["Title"] = $"{Model.Comic.Title} - Chapter {Model.ChapterNumber}";
     var images = ViewBag.Images as List<string> ?? new();
+
+    // Check if user is logged in using session
+    var userId = Context.Session.GetInt32("UserId");
+    bool isLoggedIn = userId.HasValue && userId.Value > 0;
 }
 
 <!-- Override layout chỉ cho trang này -->
@@ -71,10 +75,238 @@
         }
     </div>
 
-    <div class="mt-6 text-center pb-10">
-        <a href="@Url.Action("Details", "Comic", new { id = Model.ComicId })"
-           class="text-indigo-600 hover:underline">
-            ← Quay về trang truyện
-        </a>
+        <div class="mt-6 text-center pb-10">
+            <a href="@Url.Action("Details", "Comic", new { id = Model.ComicId })"
+               class="text-indigo-600 hover:underline">
+                ← Quay về trang truyện
+            </a>
+        </div>
+    <!-- Comments Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mt-6 max-w-4xl mx-auto">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Comments (@(ViewBag.CommentCount ?? 0))</h2>
+
+        @if (isLoggedIn)
+        {
+            <!-- Comment Form -->
+            <div class="mb-6">
+                <form id="chapterCommentForm" class="space-y-3">
+                    <textarea id="chapterCommentContent" rows="3"
+                              class="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Share your thoughts about this chapter..."></textarea>
+                    <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition duration-200">
+                        Post Comment
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <!-- Login prompt -->
+            <div class="bg-gray-50 border border-gray-200 rounded-md p-4 mb-6">
+                <p class="text-gray-700">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    Please <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Read", "Chapter", new { id = Model.ChapterId }) })"
+                              class="text-blue-600 hover:underline">login</a> to leave a comment.
+                </p>
+            </div>
+        }
+
+        <!-- Comments List -->
+        <div id="chapterCommentsList" class="space-y-4">
+            @if (ViewBag.Comments != null && ViewBag.Comments.Count > 0)
+            {
+                @foreach (var comment in ViewBag.Comments)
+                {
+                    <div class="comment-item border-b border-gray-200 pb-4" id="comment-@comment.CommentId">
+                        <div class="flex items-center mb-2 justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden mr-3">
+                                    @if (comment.UserAvatar != null)
+                                    {
+                                        <img src="data:image/png;base64,@Convert.ToBase64String(comment.UserAvatar)" alt="Avatar" class="w-full h-full object-cover">
+                                    }
+                                    else
+                                    {
+                                        <div class="w-full h-full flex items-center justify-center bg-blue-500 text-white">
+                                            @comment.Username[0]
+                                        </div>
+                                    }
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-800">@comment.Username</div>
+                                    <div class="text-xs text-gray-500">@string.Format("{0:MMM dd, yyyy HH:mm}", comment.CreatedAt)</div>
+                                </div>
+                            </div>
+                            <!-- Delete button - only visible to comment author -->
+                            @if (userId.HasValue && userId.Value == comment.UserId)
+                            {
+                                <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm"
+                                        data-comment-id="@comment.CommentId"
+                                        data-comment-type="chapter">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            }
+                        </div>
+                        <div class="pl-13 ml-13">
+                            <p class="text-gray-700">@comment.Content</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-gray-500 italic text-center py-6">
+                    No comments yet. Be the first to share your thoughts about this chapter!
+                </div>
+            }
+        </div>
     </div>
+
+
+
 </div>
+
+<!-- Add jQuery if not already included -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Handle comment submission
+        $('#chapterCommentForm').submit(function(e) {
+            e.preventDefault();
+
+            var content = $('#chapterCommentContent').val().trim();
+            if (!content) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddChapterComment", "Chapter")',
+                type: 'POST',
+                data: {
+                    chapterId: @Model.ChapterId,
+                    content: content
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Clear input
+                        $('#chapterCommentContent').val('');
+
+                        // Create and add the new comment HTML
+            var newComment = `
+                <div class="comment-item border-b border-gray-200 pb-4" id="comment-${response.commentId}">
+                    <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden mr-3">
+                        ${response.userAvatar ?
+                          `<img src="data:image/png;base64,${response.userAvatar}" alt="Avatar" class="w-full h-full object-cover">` :
+                          `<div class="w-full h-full flex items-center justify-center bg-blue-500 text-white">
+                             ${response.username.charAt(0)}
+                           </div>`
+                        }
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-800">${response.username}</div>
+                        <div class="text-xs text-gray-500">${response.createdAt}</div>
+                    </div>
+                </div>
+                <button class="delete-comment-btn text-red-500 hover:text-red-700 text-sm"
+                        data-comment-id="${response.commentId}"
+                        data-comment-type="chapter">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+            <div class="pl-13 ml-13">
+                <p class="text-gray-700">${response.content}</p>
+            </div>
+        </div>
+    `;
+
+                        // Check if no comments message exists and remove it
+                        if ($('#chapterCommentsList .italic').length) {
+                            $('#chapterCommentsList').empty();
+                        }
+
+                        // Prepend the new comment (show newest first)
+                        $('#chapterCommentsList').prepend(newComment);
+
+                        // Update comment count in section heading
+                        var commentHeading = $('.bg-white.rounded-lg.shadow-lg.p-6.mt-6 h2');
+                        var currentText = commentHeading.text();
+                        var matches = currentText.match(/Comments \((\d+)\)/);
+                        if (matches && matches.length > 1) {
+                            var count = parseInt(matches[1]) + 1;
+                            commentHeading.text('Comments (' + count + ')');
+                        }
+                    } else {
+                        alert(response.message || 'Failed to add comment. Please try again.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                    console.log("Response:", xhr.responseText);
+                    alert('Failed to add comment. Please try again.');
+                }
+            });
+        });
+            $(document).on('click', '.delete-comment-btn', function() {
+        if (!confirm('Are you sure you want to delete this comment?')) {
+            return;
+        }
+
+        var btn = $(this);
+        var commentId = btn.data('comment-id');
+        var commentType = btn.data('comment-type');
+        var commentItem = btn.closest('.comment-item');
+
+        $.ajax({
+            url: commentType === 'comic'
+                ? '@Url.Action("DeleteComment", "Comic")'
+                : '@Url.Action("DeleteChapterComment", "Chapter")',
+            type: 'POST',
+            data: { commentId: commentId },
+            success: function(response) {
+                if (response.success) {
+                    // Remove the comment from DOM
+                    commentItem.fadeOut(300, function() {
+                        $(this).remove();
+
+                        // If no comments left, show the "no comments" message
+                        var commentsList = commentType === 'comic' ? $('#commentsList') : $('#chapterCommentsList');
+                        if (commentsList.children().length === 0) {
+                            var noCommentsMessage = `
+                                <div class="text-gray-500 italic text-center py-6">
+                                    No comments yet. Be the first to share your thoughts!
+                                </div>
+                            `;
+                            commentsList.html(noCommentsMessage);
+                        }
+
+                        // Update comment count in section heading
+                        var commentHeading = $('.bg-white.rounded-lg.shadow-lg.p-6.mt-6 h2');
+                        var currentText = commentHeading.text();
+                        var matches = currentText.match(/Comments \((\d+)\)/);
+                        if (matches && matches.length > 1) {
+                            var count = Math.max(0, parseInt(matches[1]) - 1);
+                            commentHeading.text('Comments (' + count + ')');
+                        }
+
+                        // Update comment count in stats section if on comic details page
+                        if (commentType === 'comic') {
+                            var statText = $('.fas.fa-comment').next().text();
+                            var statCount = parseInt(statText.replace(/Comment: |,/g, '')) || 0;
+                            $('.fas.fa-comment').next().text('Comment: ' + Math.max(0, statCount - 1).toLocaleString());
+                        }
+                    });
+                } else {
+                    alert(response.message || 'Failed to delete comment. Please try again.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.log("Response:", xhr.responseText);
+                alert('Failed to delete comment. Please try again.');
+            }
+        });
+    });
+    });
+</script>

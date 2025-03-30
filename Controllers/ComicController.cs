@@ -95,6 +95,22 @@ namespace NettruyenRemake.Controllers
                 .Include(c => c.Chapters.OrderByDescending(c => c.ChapterNumber))
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.ComicId == id);
+            var comments = await _context.ComicComments
+                .Where(c => c.ComicId == id)
+                .OrderByDescending(c => c.CreatedAt)
+                .Select(c => new
+                {
+                    c.CommentId,
+                    c.Content,
+                    c.CreatedAt,
+                    c.UserId,
+                    Username = c.User.Username,
+                    UserAvatar = c.User.Avatar
+                })
+                .Take(20) // Limit to 20 most recent comments
+                .ToListAsync();
+
+            ViewBag.Comments = comments;
 
             if (comic == null)
             {
@@ -354,7 +370,7 @@ namespace NettruyenRemake.Controllers
             return Json(new { success = true, rating = userRating });
         }
 
-        
+
         [HttpGet]
         [Route("comic/image")]
         public async Task<IActionResult> GetComicImage(string url)
@@ -366,17 +382,17 @@ namespace NettruyenRemake.Controllers
 
             try
             {
-               
+
                 url = Uri.UnescapeDataString(url);
-                
-              
+
+
                 var imageBytes = await ImageHelper.DownloadImageAsync(url);
-                
+
                 if (imageBytes == null || imageBytes.Length == 0)
                 {
                     return NotFound();
                 }
-                
+
                 // Determine content type based on URL extension
                 string contentType = "image/jpeg"; // Default
                 if (url.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
@@ -385,7 +401,7 @@ namespace NettruyenRemake.Controllers
                     contentType = "image/gif";
                 else if (url.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
                     contentType = "image/webp";
-                
+
                 return File(imageBytes, contentType);
             }
             catch (Exception ex)
@@ -411,5 +427,111 @@ namespace NettruyenRemake.Controllers
                 return File(fallbackBytes, "image/jpeg");
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> AddComment(int comicId, string content)
+        {
+            try
+            {
+                // Check if user is logged in
+                var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId == 0)
+                {
+                    return Json(new { success = false, message = "You must be logged in to comment" });
+                }
+
+                // Validate content
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    return Json(new { success = false, message = "Comment cannot be empty" });
+                }
+
+                // Create new comment
+                var comment = new ComicComment
+                {
+                    ComicId = comicId,
+                    UserId = userId,
+                    Content = content,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.ComicComments.Add(comment);
+
+                // Update comment count in comic stats
+                var comicStat = await _context.ComicStats.FirstOrDefaultAsync(cs => cs.ComicId == comicId);
+                if (comicStat != null)
+                {
+                    comicStat.CommentCount = (comicStat.CommentCount ?? 0) + 1;
+                    comicStat.LastUpdated = DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Get user info for response
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+
+                return Json(new
+                {
+                    success = true,
+                    commentId = comment.CommentId,
+                    content = comment.Content,
+                    createdAt = string.Format("{0:MMM dd, yyyy HH:mm}", comment.CreatedAt),
+                    username = user.Username,
+                    userAvatar = user.Avatar != null ? Convert.ToBase64String(user.Avatar) : null
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteComment(int commentId)
+        {
+            try
+            {
+                // Check if user is logged in
+                var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId == 0)
+                {
+                    return Json(new { success = false, message = "You must be logged in to delete comments" });
+                }
+
+                // Find the comment
+                var comment = await _context.ComicComments.FirstOrDefaultAsync(c => c.CommentId == commentId);
+
+                // Check if comment exists
+                if (comment == null)
+                {
+                    return Json(new { success = false, message = "Comment not found" });
+                }
+
+                // Check if user is the author of the comment
+                if (comment.UserId != userId)
+                {
+                    return Json(new { success = false, message = "You can only delete your own comments" });
+                }
+
+                // Remove the comment
+                _context.ComicComments.Remove(comment);
+
+                // Update comment count in comic stats
+                var comicStat = await _context.ComicStats.FirstOrDefaultAsync(cs => cs.ComicId == comment.ComicId);
+                if (comicStat != null && comicStat.CommentCount > 0)
+                {
+                    comicStat.CommentCount -= 1;
+                    comicStat.LastUpdated = DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
+            }
+        }
+
     }
 }
