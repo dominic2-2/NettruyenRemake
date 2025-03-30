@@ -87,15 +87,16 @@
                     </div>
                     <!-- Categories with icons -->
                     <div class="mb-5">
-                        <div class="text-sm text-gray-600 mb-2"><span id="avgRating" class="font-medium">Categories:</span></div>
+                        <div class="text-sm text-gray-600 mb-2"><span class="font-medium">Categories:</span></div>
                         <div class="flex flex-wrap gap-2">
                             @if (Model.Categories != null && Model.Categories.Any())
                             {
                                 foreach (var category in Model.Categories)
                                 {
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                                    <a href="@Url.Action("ListAll", "Comic", new {sort = "newest", categoryIds = category.CategoryId })"
+                                       class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors">
                                         @category.CategoryName
-                                    </span>
+                                    </a>
                                 }
                             }
                             else
@@ -104,7 +105,6 @@
                             }
                         </div>
                     </div>
-                    
                     <!-- Follow/Rate buttons -->
                         @if (isLoggedIn)
                         {
