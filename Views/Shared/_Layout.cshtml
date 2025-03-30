@@ -30,6 +30,8 @@
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NettruyenRemake.styles.css" asp-append-version="true" />
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -47,7 +49,7 @@
                         </p>
                     </a>
 
-                    <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
+                    <nav class="flex flex-col gap-1 p-2 font-sans text-base font-normal text-gray-700">
                         <div class="block relative w-full">
                             @if (!string.IsNullOrEmpty(userName))
                             {
@@ -81,23 +83,26 @@
                                 </div>
 
                                 <div class="overflow-hidden" style="height: 0px">
-                                    <div class="block w-full py-4 text-gray-700 antialiased font-sans text-sm font-light leading-normal py-1">
-                                        <nav class="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700 p-0">
+                                    <div class="block w-full text-gray-700 antialiased font-sans text-sm font-light leading-normal">
+                                        <nav class="flex flex-col gap-1 p-2 font-sans text-base font-normal text-gray-700 p-0">
                                             <a href="@Url.Action("Edit", "Profile")"
                                                class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 data-[selected=true]:text-gray-900">
-                                                <i class="fas fa-user mr-2"></i>
-                                                My Profile
+                                                <i class="fas fa-user mr-3"></i>
+
+                                                <span class="flex-1">My Profile</span>
                                             </a>
                                             <a href="@Url.Action("History", "Chapter")"
                                                class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 data-[selected=true]:text-gray-900">
-                                                <i class="fas fa-book-open mr-2 text-blue-500"></i>
-                                                Reading History
+                                                <i class="fas fa-book-open mr-2 text-indigo-600 group-hover:text-indigo-700"></i>
+
+                                                <span class="flex-1">Reading History</span>
                                             </a>
 
                                             <a href="@Url.Action("MyFollowings", "Comic")"
                                                class="flex items-center w-full p-3 rounded-lg text-start leading-tight transition-all hover:bg-gray-50 hover:bg-opacity-80 focus:bg-gray-50 focus:bg-opacity-80 active:bg-gray-50 active:bg-opacity-80 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 outline-none px-16 select-none hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-100 hover:text-gray-900 focus:text-gray-900 active:text-gray-900 data-[selected=true]:text-gray-900">
                                                 <i class="fas fa-heart mr-2 text-pink-500"></i>
-                                                My Follows
+
+                                                <span class="flex-1">My Follows</span>
                                             </a>
                                             <a asp-action="Logout" asp-controller="Authen">
                                                 <div role="button"
@@ -182,18 +187,12 @@
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      viewBox="0 0 24 24"
                                      fill="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
                                      class="h-5 w-5">
-                                    <path fill-rule="evenodd"
-                                          d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z"
-                                          clip-rule="evenodd"></path>
-                                    <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z"></path>
+                                    <path d="M4 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4zm2 4h12v2H6V7zm0 4h12v2H6v-2zm0 4h12v2H6v-2z" />
                                 </svg>
                             </div>
-                            Accounts
+                            <a href="@Url.Action("Index", "ManageComics")" class="block w-full text-black">Comics</a>
                         </div>
-                       
                        
                         <div role="button"
                              data-ripple-dark="true"
@@ -203,17 +202,12 @@
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      viewBox="0 0 24 24"
                                      fill="currentColor"
-                                     aria-hidden="true"
-                                     data-slot="icon"
                                      class="h-5 w-5">
-                                    <path fill-rule="evenodd"
-                                          d="M3.25 12a8.75 8.75 0 0 1 17.5 0 8.75 8.75 0 0 1-17.5 0ZM12 1.25C6.06 1.25 1.25 6.06 1.25 12S6.06 22.75 12 22.75 22.75 17.94 22.75 12 17.94 1.25 12 1.25Zm0 8a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
-                                          clip-rule="evenodd"></path>
+                                    <path d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.5 1.5 0 0 1 1.041 1.837l-4 12a1.5 1.5 0 0 1-1.415 1.025h-7.67a1.5 1.5 0 0 1-1.415-1.025l-4-12a1.5 1.5 0 0 1 1.041-1.837zM5.694 5.25l3.47 10.41h5.672l3.47-10.41H5.694z" />
                                 </svg>
                             </div>
-                            <a href="@Url.Action("Index", "ManageComics")" class="block w-full">Comics</a>
+                            <a href="@Url.Action("ListAll", "Comic")" class="block w-full text-black">Filter</a>
                         </div>
-                       
                     </nav>
                    
                 </div>
@@ -269,14 +263,24 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <div class="relative flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600">
-                            <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
-                        </svg>
+                    <form method="get" asp-controller="Comic" asp-action="ListAll" class="w-full max-w-sm mx-auto">
+                        <div class="relative flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                 fill="currentColor"
+                                 class="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600">
+                                <path fill-rule="evenodd"
+                                      d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                                      clip-rule="evenodd" />
+                            </svg>
 
-                        <input class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                               placeholder="UI Kits, Dashboards..." />
-                    </div>
+                            <input type="text"
+                                   name="keyword"
+                                   value="@(Context.Request.Query["keyword"])"
+                                   class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                                   placeholder="Tìm truyện hoặc tác giả..." />
+                        </div>
+                    </form>
+
 
                     @if (string.IsNullOrEmpty(userName))
                     {
@@ -385,6 +389,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/scripts/popover.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/scripts/collapse.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

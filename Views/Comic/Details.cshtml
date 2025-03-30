@@ -20,7 +20,6 @@
     <!-- Tailwind CSS and Material Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/styles/material-tailwind.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@@material-tailwind/html@latest/scripts/script.js"></script>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
@@ -86,56 +85,75 @@
                             <span class="text-xs text-gray-500 ml-1">(@ViewBag.RatingCount)</span>
                         </div>
                     </div>
-                    
-                    <!-- Follow/Rate buttons -->
-                    @if (isLoggedIn)
-                    {
-                        <button id="followBtn" 
-                                class="w-full py-2 rounded-md @(isFollowing ? "bg-pink-100 text-pink-700" : "bg-blue-600 text-white") hover:opacity-90 transition-colors mb-3">
-                            <i class="fas @(isFollowing ? "fa-heart" : "fa-heart") mr-1"></i>
-                            @(isFollowing ? "Following" : "Follow")
-                        </button>
-                        
-                        <div class="mb-4">
-                            <div class="flex items-center justify-center" id="ratingStars">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    <button class="rating-star text-xl mx-1 @(ViewBag.UserRating >= i ? "text-yellow-400" : "text-gray-300")" 
-                                            data-rating="@i">
-                                        <i class="fas fa-star"></i>
-                                    </button>
-                                }
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1 text-center">
-                                @if (ViewBag.UserRating > 0)
-                                {
-                                    <span>Your rating: <span id="userRatingText">@ViewBag.UserRating</span>/5</span>
-                                }
-                                else
-                                {
-                                    <span id="userRatingText">Rate this comic</span>
-                                }
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Details", "Comic", new { id = Model.ComicId }) })" 
-                           class="block w-full py-2 text-center bg-blue-600 text-white rounded-md shadow hover:opacity-90 transition-colors mb-4">
-                            <i class="fas fa-sign-in-alt mr-1"></i> Login to follow/rate
-                        </a>
-                    }
-                    
-                    <!-- Description -->
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900 mb-2">Description</h2>
-                        <div class="prose max-w-none text-gray-700">
-                            @if (string.IsNullOrEmpty(Model.Description))
+                    <!-- Categories with icons -->
+                    <div class="mb-5">
+                        <div class="text-sm text-gray-600 mb-2"><span class="font-medium">Categories:</span></div>
+                        <div class="flex flex-wrap gap-2">
+                            @if (Model.Categories != null && Model.Categories.Any())
                             {
-                                <p class="italic text-gray-500">No description available for this comic.</p>
+                                foreach (var category in Model.Categories)
+                                {
+                                    <a href="@Url.Action("ListAll", "Comic", new {sort = "newest", categoryIds = category.CategoryId })"
+                                       class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors">
+                                        @category.CategoryName
+                                    </a>
+                                }
                             }
                             else
                             {
+                                <span class="text-gray-500 italic">No categories</span>
+                            }
+                        </div>
+                    </div>
+                    <!-- Follow/Rate buttons -->
+                        @if (isLoggedIn)
+                        {
+                                <button id="followBtn" 
+                                class="w-full py-2 rounded-md @(isFollowing ? "bg-pink-100 text-pink-700" : "bg-blue-600 text-white") hover:opacity-90 transition-colors mb-3">
+                            <i class="fas @(isFollowing ? "fa-heart" : "fa-heart") mr-1"></i>
+                            @(isFollowing ? "Following" : "Follow")
+                                </button>
+
+                        <div class="mb-4">
+                            <div class="flex items-center justify-center" id="ratingStars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                    <button class="rating-star text-xl mx-1 @(ViewBag.UserRating >= i ? "text-yellow-400" : "text-gray-300")" 
+                                                        data-rating="@i">
+                                                    <i class="fas fa-star"></i>
+                                                </button>
+                                    }
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1 text-center">
+                                    @if (ViewBag.UserRating > 0)
+                                    {
+                                    <span>Your rating: <span id="userRatingText">@ViewBag.UserRating</span>/5</span>
+                                    }
+                                    else
+                                    {
+                                    <span id="userRatingText">Rate this comic</span>
+                                    }
+                                    </p>
+                                </div>
+                        }
+                        else
+                        {
+                                <a href="@Url.Action("Login", "Authen", new { returnUrl = Url.Action("Details", "Comic", new { id = Model.ComicId }) })" 
+                           class="block w-full py-2 text-center bg-blue-600 text-white rounded-md shadow hover:opacity-90 transition-colors mb-4">
+                            <i class="fas fa-sign-in-alt mr-1"></i> Login to follow/rate
+                                </a>
+                        }
+
+                <!-- Description -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-2">Description</h2>
+                    <div class="prose max-w-none text-gray-700">
+                        @if (string.IsNullOrEmpty(Model.Description))
+                        {
+                                <p class="italic text-gray-500">No description available for this comic.</p>
+                        }
+                        else
+                        {
                                 <div class="description-container">
                                     <div class="description-content overflow-hidden transition-all duration-300" style="max-height: 100px;">
                                         <p>@Model.Description</p>
@@ -145,41 +163,41 @@
                                         <i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300"></i>
                                     </button>
                                 </div>
-                            }
+                        }
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Chapters -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-3">Chapters</h2>
-            @if (!Model.Chapters.Any())
-            {
-                <p class="italic text-gray-500">No chapters available yet.</p>
-            }
-            else
-            {
-                <div class="space-y-1">
-                    @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.ChapterNumber))
-                    {
-                        <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" 
-                           class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
-                            <span class="text-blue-600 font-medium">
-                                Chapter @chapter.ChapterNumber
-                                @if (!string.IsNullOrEmpty(chapter.Title))
-                                {
-                                    <span class="text-gray-700 font-normal"> - @chapter.Title</span>
-                                }
-                            </span>
-                            <span class="text-gray-500 text-sm">
-                                @(chapter.CreatedAt.HasValue ? chapter.CreatedAt.Value.ToString("MMM dd, yyyy") : "")
-                            </span>
-                        </a>
-                    }
+                    </div>
                 </div>
-            }
+
+                <!-- Chapters -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Chapters</h2>
+                    @if (!Model.Chapters.Any())
+                    {
+                            <p class="italic text-gray-500">No chapters available yet.</p>
+                    }
+                    else
+                    {
+                            <div class="space-y-1">
+                            @foreach (var chapter in Model.Chapters.OrderByDescending(c => c.ChapterNumber))
+                            {
+                                        <a href="@Url.Action("Read", "Chapter", new { id = chapter.ChapterId })" 
+                                           class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-md transition-colors">
+                            <span class="text-blue-600 font-medium">
+                                                Chapter @chapter.ChapterNumber
+                                        @if (!string.IsNullOrEmpty(chapter.Title))
+                                        {
+                                                        <span class="text-gray-700 font-normal"> - @chapter.Title</span>
+                                        }
+                                            </span>
+                                            <span class="text-gray-500 text-sm">
+                                        @(chapter.CreatedAt.HasValue ? chapter.CreatedAt.Value.ToString("MMM dd, yyyy") : "")
+                                            </span>
+                                        </a>
+                            }
+                            </div>
+                    }
         </div>
     </div>
 
@@ -194,70 +212,134 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#followBtn').click(function() {
-            var btn = $(this);
-            var isFollowing = btn.hasClass('bg-pink-100');
+        $(document).ready(function() {
+            $('#followBtn').click(function() {
+                var btn = $(this);
+                var isFollowing = btn.hasClass('bg-pink-100');
 
-            $.ajax({
-                url: '@Url.Action("ToggleFollow", "Comic")',
-                type: 'POST',
-                data: { comicId: @Model.ComicId },
-                success: function(response) {
-                    if (response.success) {
-                        if (response.following) {
-                            // Update to "following" state
-                            btn.html('<i class="fas fa-heart mr-2"></i> Following');
-                            btn.removeClass('bg-blue-600 text-white').addClass('bg-pink-100 text-pink-700');
+                $.ajax({
+                    url: '@Url.Action("ToggleFollow", "Comic")',
+                    type: 'POST',
+                    data: { comicId: @Model.ComicId },
+                    success: function(response) {
+                        if (response.success) {
+                            if (response.following) {
+                                // Update to "following" state
+                                btn.html('<i class="fas fa-heart mr-2"></i> Following');
+                                btn.removeClass('bg-blue-600 text-white').addClass('bg-pink-100 text-pink-700');
 
-                            // Update follow count
-                            var currentCount = parseInt($('#followCount').text().replace(/,/g, ''));
-                            $('#followCount').text((currentCount + 1).toLocaleString());
+                                // Update follow count
+                                var currentText = $('#followCount').text();
+                                var currentCount = parseInt(currentText.replace(/Follow: |,/g, '')) || 0;
+                                $('#followCount').text('Follow: ' + (currentCount + 1).toLocaleString());
+                            } else {
+                                // Update to "not following" state
+                                btn.html('<i class="fas fa-heart mr-2"></i> Follow');
+                                btn.removeClass('bg-pink-100 text-pink-700').addClass('bg-blue-600 text-white');
+
+                                // Update follow count
+                                var currentText = $('#followCount').text();
+                                var currentCount = parseInt(currentText.replace(/Follow: |,/g, '')) || 0;
+                                $('#followCount').text('Follow: ' + Math.max(0, currentCount - 1).toLocaleString());
+                            }
                         } else {
-                            // Update to "not following" state
-                            btn.html('<i class="fas fa-heart mr-2"></i> Follow');
-                            btn.removeClass('bg-pink-100 text-pink-700').addClass('bg-blue-600 text-white');
-
-                            // Update follow count
-                            var currentCount = parseInt($('#followCount').text().replace(/,/g, ''));
-                            $('#followCount').text(Math.max(0, currentCount - 1).toLocaleString());
+                            alert(response.message || 'Failed to update follow status.');
                         }
-                    } else {
-                        alert(response.message || 'Failed to update follow status.');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        console.log("Response:", xhr.responseText);
+                        alert('Failed to update follow status. Please try again.');
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error:", status, error);
-                    console.log("Response:", xhr.responseText);
-                    alert('Failed to update follow status. Please try again.');
+                });
+            });
+
+            // Description toggle
+            $('#description-toggle').click(function() {
+                var container = $('.description-content');
+                var button = $(this);
+                var icon = button.find('i');
+
+                if (container.css('max-height') === '100px') {
+                    // Expand
+                    container.css('max-height', container[0].scrollHeight + 'px');
+                    button.find('span').text('Show Less');
+                    icon.addClass('rotate-180');
+                } else {
+                    // Collapse
+                    container.css('max-height', '100px');
+                    button.find('span').text('Show More');
+                    icon.removeClass('rotate-180');
                 }
             });
-        });
 
-        // Description toggle
-        $('#description-toggle').click(function() {
-            var container = $('.description-content');
-            var button = $(this);
-            var icon = button.find('i');
+            // Rating stars functionality
+            $('.rating-star').hover(
+                function() {
+                    var rating = $(this).data('rating');
+                    // On hover, highlight this star and all previous stars
+                    $('.rating-star').each(function() {
+                        if ($(this).data('rating') <= rating) {
+                            $(this).addClass('text-yellow-400').removeClass('text-gray-300');
+                        } else {
+                            $(this).addClass('text-gray-300').removeClass('text-yellow-400');
+                        }
+                    });
+                },
+                function() {
+                    // On mouseout, restore original state based on user's rating
+                    var userRating = parseInt($('#userRatingText').text()) || 0;
+                    $('.rating-star').each(function() {
+                        if ($(this).data('rating') <= userRating) {
+                            $(this).addClass('text-yellow-400').removeClass('text-gray-300');
+                        } else {
+                            $(this).addClass('text-gray-300').removeClass('text-yellow-400');
+                        }
+                    });
+                }
+            );
 
-            if (container.css('max-height') === '100px') {
-                // Expand
-                container.css('max-height', container[0].scrollHeight + 'px');
-                button.find('span').text('Show Less');
-                icon.addClass('rotate-180');
-            } else {
-                // Collapse
-                container.css('max-height', '100px');
-                button.find('span').text('Show More');
-                icon.removeClass('rotate-180');
-            }
-        });
+            $('.rating-star').click(function() {
+                var ratingValue = $(this).data('rating');
 
-        // Rating stars functionality
-        $('.rating-star').hover(
-            function() {
-                var rating = $(this).data('rating');
-                // On hover, highlight this star and all previous stars
+                $.ajax({
+                    url: '@Url.Action("RateComic", "Comic")',
+                    type: 'POST',
+                    data: {
+                        comicId: @Model.ComicId,
+                        rating: ratingValue
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Store the rating value
+                            var savedRating = ratingValue;
+
+                            // Update the average rating display in the stats section
+                            $('#avgRating').text('Rating: ' + response.averageRating);
+
+                            // Update rating count in the stats section
+                            var countSpan = $('#avgRating').next();
+                            countSpan.text('(' + response.ratingCount + ')');
+
+                            // Update the user rating text
+                            $('#userRatingText').text(savedRating);
+
+                            // Update the star highlighting to match the saved rating
+                            updateStarDisplay(savedRating);
+                        } else {
+                            alert(response.message || 'Failed to save rating. Please try again.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        console.log("Response:", xhr.responseText);
+                        alert('Failed to save rating. Please try again.');
+                    }
+                });
+            });
+
+            // Helper function to update star display based on rating
+            function updateStarDisplay(rating) {
                 $('.rating-star').each(function() {
                     if ($(this).data('rating') <= rating) {
                         $(this).addClass('text-yellow-400').removeClass('text-gray-300');
@@ -265,71 +347,12 @@
                         $(this).addClass('text-gray-300').removeClass('text-yellow-400');
                     }
                 });
-            },
-            function() {
-                // On mouseout, restore original state based on user's rating
-                var userRating = parseInt($('#userRatingText').text()) || 0;
-                $('.rating-star').each(function() {
-                    if ($(this).data('rating') <= userRating) {
-                        $(this).addClass('text-yellow-400').removeClass('text-gray-300');
-                    } else {
-                        $(this).addClass('text-gray-300').removeClass('text-yellow-400');
-                    }
-                });
             }
-        );
 
-        $('.rating-star').click(function() {
-            var ratingValue = $(this).data('rating');
-
-            $.ajax({
-                url: '@Url.Action("RateComic", "Comic")',
-                type: 'POST',
-                data: { 
-                    comicId: @Model.ComicId, 
-                    rating: ratingValue 
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // Store the rating value
-                        var savedRating = ratingValue;
-
-                        // Update the average rating display
-                        $('#avgRating').text(response.averageRating);
-                        $('#userRatingText').text(savedRating);
-
-                        // Update the star highlighting to match the saved rating
-                        updateStarDisplay(savedRating);
-
-                        // Show a success message
-                        alert('Your rating has been saved!');
-                    } else {
-                        alert(response.message || 'Failed to save rating. Please try again.');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error:", status, error);
-                    console.log("Response:", xhr.responseText);
-                    alert('Failed to save rating. Please try again.');
-                }
-            });
+            // Initialize stars on page load
+            var initialRating = parseInt($('#userRatingText').text()) || 0;
+            updateStarDisplay(initialRating);
         });
-
-        // Helper function to update star display based on rating
-        function updateStarDisplay(rating) {
-            $('.rating-star').each(function() {
-                if ($(this).data('rating') <= rating) {
-                    $(this).addClass('text-yellow-400').removeClass('text-gray-300');
-                } else {
-                    $(this).addClass('text-gray-300').removeClass('text-yellow-400');
-                }
-            });
-        }
-
-        // Initialize stars on page load
-        var initialRating = parseInt($('#userRatingText').text()) || 0;
-        updateStarDisplay(initialRating);
-    });
     </script>
 </body>
 </html> 

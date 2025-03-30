@@ -34,8 +34,10 @@ namespace NettruyenRemake.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
+            int pageSize = 21;
+
             var top5New = await _context.Comics
                 .Include(c => c.Categories)
                 .Include(c => c.Status)
@@ -45,52 +47,67 @@ namespace NettruyenRemake.Controllers
                 .ToListAsync();
 
             var top5Viewed = await _context.ComicStats
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Categories)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Status)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Chapters)
+                .Include(cs => cs.Comic).ThenInclude(c => c.Categories)
+                .Include(cs => cs.Comic).ThenInclude(c => c.Status)
+                .Include(cs => cs.Comic).ThenInclude(c => c.Chapters)
                 .OrderByDescending(cs => cs.ViewCount)
                 .Take(5)
                 .Select(cs => cs.Comic)
                 .ToListAsync();
 
-            var top5Followed = await _context.ComicStats
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Status)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Chapters)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Categories)
-                .OrderByDescending(cs => cs.FollowCount)
+            var top5Followed = await _context.Comics
+                .Include(c => c.ComicStat)
+                .Include(c => c.Status)
+                .Include(c => c.Chapters)
+                .Include(c => c.Categories)
+                .OrderByDescending(c => c.ComicStat.FollowCount)
                 .Take(5)
-                .Select(cs => cs.Comic)
                 .ToListAsync();
 
-            var top5Commented = await _context.ComicStats
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Chapters)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Categories)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Status)
-                .OrderByDescending(cs => cs.CommentCount)
+
+            var top5Commented = await _context.Comics
+                .Include(c => c.ComicStat)
+                .Include(c => c.Status)
+                .Include(c => c.Categories)
+                .Include(c => c.Chapters)
+                .OrderByDescending(c => c.ComicStat.CommentCount)
                 .Take(5)
-                .Select(cs => cs.Comic)
                 .ToListAsync();
 
-            var top5Rated = await _context.ComicStats
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Status)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Categories)
-                .Include(cs => cs.Comic)
-                    .ThenInclude(c => c.Chapters)
-                .OrderByDescending(cs => cs.RatingCount)
+
+            var top5Rated = await _context.Comics
+                .Include(c => c.ComicStat)
+                .Include(c => c.Status)
+                .Include(c => c.Categories)
+                .Include(c => c.Chapters)
+                .OrderByDescending(c => c.ComicStat.RatingCount)
                 .Take(5)
-                .Select(cs => cs.Comic)
                 .ToListAsync();
+
+
+            var totalComics = await _context.Chapters
+                .Select(c => c.ComicId)
+                .Distinct()
+                .CountAsync();
+
+            var latestUpdated = await _context.Chapters
+                .GroupBy(c => c.ComicId)
+                .Select(g => new { ComicId = g.Key, LatestChapterDate = g.Max(c => c.CreatedAt) })
+                .OrderByDescending(c => c.LatestChapterDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Join(_context.Comics,
+                      c => c.ComicId,
+                      comic => comic.ComicId,
+                      (c, comic) => comic)
+                .Include(c => c.Categories)
+                .Include(c => c.Status)
+                .Include(c => c.Chapters)
+                .ToListAsync();
+
+            ViewBag.LatestUpdated = latestUpdated;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
 
             ViewBag.TopViewed = top5Viewed;
             ViewBag.TopFollowed = top5Followed;
@@ -99,6 +116,8 @@ namespace NettruyenRemake.Controllers
 
             return View(top5New); // model vẫn là top5 new
         }
+
+
 
 
     }

@@ -19,34 +19,67 @@ namespace NettruyenRemake.Controllers
         }
 
 
-        public async Task<IActionResult> ListAll()
+        public async Task<IActionResult> ListAll(string keyword = "", string sort = "newest", List<int> categoryIds = null, int page = 1, int pageSize = 24)
         {
-            var comics = await _context.Comics
+            var comicsQuery = _context.Comics
                 .Include(c => c.Status)
                 .Include(c => c.ComicStat)
+                .Include(c => c.Categories)
                 .Include(c => c.Chapters.OrderByDescending(c => c.ChapterNumber).Take(3))
                 .AsSplitQuery()
+                .AsQueryable();
+
+            // Tìm kiếm theo từ khóa
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.Trim().ToLower();
+                comicsQuery = comicsQuery.Where(c =>
+                    c.Title.ToLower().Contains(keyword) ||
+                    c.Author.ToLower().Contains(keyword));
+            }
+
+            // Lọc theo thể loại
+            if (categoryIds != null && categoryIds.Any())
+            {
+                comicsQuery = comicsQuery
+                    .Where(c => categoryIds.All(cid => c.Categories.Select(cat => cat.CategoryId).Contains(cid)));
+            }
+
+            // Sắp xếp
+            comicsQuery = sort switch
+            {
+                "views" => comicsQuery.OrderByDescending(c => c.ComicStat.ViewCount),
+                "likes" => comicsQuery.OrderByDescending(c => c.ComicStat.FollowCount),
+                "recent" => comicsQuery.OrderByDescending(c => c.Chapters.Max(ch => ch.CreatedAt)),
+                _ => comicsQuery.OrderByDescending(c => c.UpdatedAt)
+            };
+
+
+            // Tính tổng và áp dụng phân trang
+            var totalComics = await comicsQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalComics / (double)pageSize);
+
+            var comics = await comicsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            // Get user ID from session
+            // Dữ liệu cho dropdown lọc
+            ViewBag.Categories = await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync();
+            ViewBag.Sort = sort;
+            ViewBag.SelectedCategoryIds = categoryIds ?? new List<int>();
+            ViewBag.Keyword = keyword;
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            // Dữ liệu follow & rating
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
 
-            if (userId > 0)
-            {
-                // Get all comic IDs that the user is following
-                var followedComicIds = await _context.Follows
-                    .Where(f => f.UserId == userId)
-                    .Select(f => f.ComicId)
-                    .ToListAsync();
+            ViewBag.FollowedComicIds = userId > 0
+                ? await _context.Follows.Where(f => f.UserId == userId).Select(f => f.ComicId).ToListAsync()
+                : new List<int>();
 
-                ViewBag.FollowedComicIds = followedComicIds;
-            }
-            else
-            {
-                ViewBag.FollowedComicIds = new List<int>();
-            }
-
-            // Calculate average ratings for each comic
             var comicRatings = new Dictionary<int, double>();
             var comicRatingCounts = new Dictionary<int, int>();
 
@@ -66,6 +99,8 @@ namespace NettruyenRemake.Controllers
 
             return View(comics);
         }
+
+
 
         // Get comic details
         public async Task<IActionResult> Details(int id)
@@ -103,10 +138,7 @@ namespace NettruyenRemake.Controllers
             ViewBag.AverageRating = Math.Round(averageRating, 1);
 
             // Get rating count
-            var ratingCount = await _context.Ratings
-                .Where(r => r.ComicId == id)
-                .CountAsync();
-            ViewBag.RatingCount = ratingCount;
+            ViewBag.RatingCount = comic.ComicStat?.RatingCount ?? 0;
 
             ViewBag.IsFollowing = isFollowing;
 
@@ -244,6 +276,7 @@ namespace NettruyenRemake.Controllers
             }
         }
 
+
         [HttpPost]
         public async Task<IActionResult> RateComic(int comicId, int rating)
         {
@@ -267,6 +300,8 @@ namespace NettruyenRemake.Controllers
                 var existingRating = await _context.Ratings
                     .FirstOrDefaultAsync(r => r.UserId == userId && r.ComicId == comicId);
 
+                var comicStat = await _context.ComicStats.FirstOrDefaultAsync(cs => cs.ComicId == comicId);
+
                 if (existingRating != null)
                 {
                     // Update existing rating
@@ -285,6 +320,13 @@ namespace NettruyenRemake.Controllers
                     };
 
                     _context.Ratings.Add(newRating);
+
+                    // Increment rating count in comic stats for new ratings
+                    if (comicStat != null)
+                    {
+                        comicStat.RatingCount = (comicStat.RatingCount ?? 0) + 1;
+                        comicStat.LastUpdated = DateTime.Now;
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -294,9 +336,8 @@ namespace NettruyenRemake.Controllers
                     .Where(r => r.ComicId == comicId)
                     .AverageAsync(r => r.RatingValue) ?? 0;
 
-                var ratingCount = await _context.Ratings
-                    .Where(r => r.ComicId == comicId)
-                    .CountAsync();
+                // Get rating count from comic_stats
+                var ratingCount = comicStat?.RatingCount ?? 0;
 
                 return Json(new
                 {
@@ -312,7 +353,6 @@ namespace NettruyenRemake.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
         [HttpGet]
         public async Task<IActionResult> GetUserRating(int comicId)
         {

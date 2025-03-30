@@ -11,59 +11,30 @@
 </head>
 <body class="bg-gray-100 text-black font-sans">
     <div class="container mx-auto p-6">
-        <!-- 📚 5 Truyện Mới Nhất -->
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">📚 5 Truyện Mới Nhất</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            @foreach (var comic in Model)
-            {
-                var latest = comic.Chapters?.OrderByDescending(c => c.ChapterNumber).FirstOrDefault();
-
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                    <!-- Ảnh có link sang trang chi tiết -->
-                    <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "https://via.placeholder.com/150x200" : 
-                                  (comic.ThumbnailUrl.StartsWith("http") ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl }) : comic.ThumbnailUrl))"
-                             alt="@comic.Title"
-                             class="w-full h-64 object-cover"
-                             style="aspect-ratio: 3/4;"
-                             onerror="this.src='https://via.placeholder.com/150x200';" />
-                    </a>
-
-                    <div class="p-4">
-                        <!-- Tên truyện có link -->
-                        <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                            <h3 class="text-lg font-bold truncate hover:text-indigo-600 transition-colors">
-                                @comic.Title
-                            </h3>
-                        </a>
-
-                        <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p>
-                        <p class="text-sm text-gray-600">Trạng thái: @(comic.Status?.StatusName ?? "Không rõ")</p>
-
-                        @if (latest != null)
-                        {
-                            <a href="@Url.Action("Read", "Chapter", new { id = latest.ChapterId })"
-                               class="mt-2 block text-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
-                                Đọc Chapter @latest.ChapterNumber
-                            </a>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
+        
         <br />
-        <!-- 🔥 Top 5 Truyện Được Xem Nhiều Nhất -->
-        <h2 class="text-2xl font-bold text-red-600 mb-4">🔥 Truyện Được Xem Nhiều Nhất</h2>
+        <!-- Header có tiêu đề và nút xem tất cả nằm trên cùng một dòng -->
+        <div class="flex items-center justify-between mb-4 mt-10">
+            <h2 class="text-2xl font-bold text-red-600">🔥 Truyện Được Xem Nhiều Nhất</h2>
+            <a href="https://localhost:7101/Comic/ListAll?keyword=&sort=newest"
+               class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                Xem tất cả →
+            </a>
+        </div>
+
+        <!-- Grid hiển thị danh sách truyện -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
             @foreach (var comic in topViewed)
             {
                 var latestChapter = comic.Chapters?.OrderByDescending(c => c.ChapterNumber).FirstOrDefault();
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
 
-                    <!-- Bọc ảnh bằng link tới chi tiết -->
                     <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
-                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl) ? "https://via.placeholder.com/150x200" : 
-                                  (comic.ThumbnailUrl.StartsWith("http") ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl }) : comic.ThumbnailUrl))"
+                        <img src="@(string.IsNullOrEmpty(comic.ThumbnailUrl)
+                            ? "https://via.placeholder.com/150x200"
+                            : (comic.ThumbnailUrl.StartsWith("http")
+                                ? Url.Action("GetComicImage", "Comic", new { url = comic.ThumbnailUrl })
+                                : comic.ThumbnailUrl))"
                              alt="@comic.Title"
                              class="w-full h-64 object-cover"
                              style="aspect-ratio: 3/4;"
@@ -71,14 +42,12 @@
                     </a>
 
                     <div class="p-4">
-                        <!-- Bọc tiêu đề bằng link tới chi tiết -->
                         <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
                             <h3 class="text-lg font-bold truncate hover:text-red-600 transition-colors">
                                 @comic.Title
                             </h3>
                         </a>
 
-                        @* <p class="text-sm text-gray-600">👁️ @comic.ComicStat?.ViewCount?.ToString("N0") lượt xem</p> *@
                         <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p>
                         <p class="text-sm text-gray-600">Trạng thái: @(comic.Status?.StatusName ?? "Không rõ")</p>
 
@@ -95,7 +64,81 @@
         </div>
 
 
-        
+        @{
+            var latestUpdated = ViewBag.LatestUpdated as List<NettruyenRemake.Models.Comic>;
+            var currentPage = ViewBag.CurrentPage as int? ?? 1;
+            var totalPages = ViewBag.TotalPages as int? ?? 1;
+        }
+
+        @if (latestUpdated != null && latestUpdated.Any())
+        {
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">📚 Truyện mới cập nhật</h2>
+
+                    <a href="https://localhost:7101/Comic/ListAll?keyword=&sort=recent"
+                       class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                        Xem tất cả →
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    @foreach (var comic in latestUpdated)
+                    {
+                        var latestChapters = comic.Chapters
+                        .OrderByDescending(c => c.CreatedAt)
+                        .Take(3)
+                        .ToList();
+
+                        <div class="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex">
+                            <!-- ẢNH TRUYỆN -->
+                            <div class="w-40">
+                                <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })">
+                                    <img src="@Url.Action("ProxyImage", "Comic", new { url = comic.ThumbnailUrl })"
+                                         class="h-full w-full object-cover"
+                                         style="aspect-ratio: 3/4;"
+                                         onerror="this.src='https://via.placeholder.com/150x200';">
+                                </a>
+                            </div>
+
+                            <!-- THÔNG TIN TRUYỆN -->
+                            <div class="flex-1 p-4">
+                                <a href="@Url.Action("Details", "Comic", new { id = comic.ComicId })" class="hover:underline hover:text-indigo-700 transition">
+                                    <h3 class="text-lg font-semibold mb-1">@comic.Title</h3>
+                                </a>
+
+                                <p class="text-sm text-gray-500 mb-2">✍️ Tác giả: @comic.Author</p>
+
+                                <ul class="space-y-1 mb-3">
+                                    @foreach (var chap in latestChapters)
+                                    {
+                                        <li>
+                                            <a href="@Url.Action("Read", "Chapter", new { id = chap.ChapterId })"
+                                               class="text-sm text-indigo-600 hover:underline hover:text-indigo-800 transition">
+                                                📖 Chapter @chap.ChapterNumber
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="flex justify-center items-center mt-6 space-x-2">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        var isActive = i == currentPage;
+                        var cssClass = isActive
+                        ? "px-3 py-1 rounded-md bg-blue-500 text-white border border-blue-500"
+                        : "px-3 py-1 rounded-md text-gray-700 border border-gray-300 hover:bg-gray-200";
+
+                        <a href="@Url.Action("Index", "Home", new { page = i })" class="@cssClass">@i</a>
+
+                    }
+                </div>
+
+            </div>
+        }
 
         @{
             var topFollowed = ViewBag.TopFollowed as List<NettruyenRemake.Models.Comic>;
@@ -103,7 +146,6 @@
             var topRated = ViewBag.TopRated as List<NettruyenRemake.Models.Comic>;
         }
 
-        <!-- 💗 Top 5 Truyện Được Theo Dõi Nhiều Nhất -->
         <!-- 💗 Top 5 Truyện Được Theo Dõi Nhiều Nhất -->
         <h2 class="text-2xl font-bold text-pink-600 mb-4 mt-10">💗 Truyện Được Theo Dõi Nhiều Nhất</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -131,7 +173,7 @@
                         </a>
 
                         <p class="text-sm text-gray-600">💗 @comic.ComicStat?.FollowCount?.ToString("N0") theo dõi</p>
-                        <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p>
+                        @* <p class="text-sm text-gray-600">Tác giả: @(comic.Author ?? "Không rõ")</p> *@
 
                         @if (latest != null)
                         {

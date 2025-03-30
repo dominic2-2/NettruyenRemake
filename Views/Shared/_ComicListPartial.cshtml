@@ -48,7 +48,6 @@
 
     /* Căn chỉnh các nút bằng flex */
     .action-buttons {
-        display: flex;
         align-items: center;
         gap: 5px;
         height: 100%;
@@ -129,12 +128,12 @@
     <table class="comic-table">
         <thead>
             <tr>
-                <th style="width: 5%;">@Html.DisplayNameFor(model => model.First().ComicId)</th>
+                <th style="width: 5%;">Comic ID</th>
                 <th style="width: 10%;">Image</th>
-                <th style="width: 25%;">@Html.DisplayNameFor(model => model.First().Title)</th>
-                <th style="width: 15%;">@Html.DisplayNameFor(model => model.First().Author)</th>
-                <th style="width: 13%;">@Html.DisplayNameFor(model => model.First().CreatedAt)</th>
-                <th style="width: 13%;">@Html.DisplayNameFor(model => model.First().UpdatedAt)</th>
+                <th style="width: 25%;">Title</th>
+                <th style="width: 15%;">Author</th>
+                <th style="width: 13%;">Created At</th>
+                <th style="width: 13%;">Updated At</th>
                 <th style="width: 19%;">Actions</th>
             </tr>
         </thead>
@@ -156,6 +155,7 @@
                         <a href="/Comic/Details/@item.ComicId" class="btn-view">View</a>
                         <a asp-action="Edit" asp-route-id="@item.ComicId" class="btn-edit">Edit</a>
                         <a asp-action="Delete" asp-route-id="@item.ComicId" class="btn-delete">Delete</a>
+                        <br><br>
                         <a href="/ManageComics/ManageChapters/?comicId=@item.ComicId" class="btn-chapters">Manage Chapters</a>
                     </td>
                 </tr>
