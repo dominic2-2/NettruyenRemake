@@ -33,11 +33,14 @@ namespace NettruyenRemake.Helpers
                     Credentials = new NetworkCredential(username, password)
                 };
 
-                var mailMessage = new MailMessage(from, to)
+                var fromAddress = new MailAddress(from, "NettruyenRemake");
+                var mailMessage = new MailMessage
                 {
+                    From = fromAddress,
                     Subject = subject,
                     Body = body
                 };
+                mailMessage.To.Add(to);
 
                 smtpClient.Send(mailMessage);
                 return true;

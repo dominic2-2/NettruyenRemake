@@ -395,17 +395,22 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll("[role='button']").forEach(button => {
-                button.addEventListener("click", function () {
-                    let menu = this.nextElementSibling;
-                    if (menu && menu.style.height === "0px") {
-                        menu.style.height = menu.scrollHeight + "px";
-                    } else {
-                        menu.style.height = "0px";
-                    }
-                });
+        document.addEventListener("DOMContentLoaded", () => {
+          document.querySelectorAll("[role='button']").forEach((button) => {
+            button.addEventListener("click", () => {
+              const menu = button.nextElementSibling;
+              if (!menu) return;
+
+              const currentHeight = getComputedStyle(menu).height;
+              const isCollapsed = currentHeight === "0px";
+
+              if (isCollapsed) {
+                menu.style.height = menu.scrollHeight + "px";
+              } else {
+                menu.style.height = "0px";
+              }
             });
+          });
         });
     </script>
 

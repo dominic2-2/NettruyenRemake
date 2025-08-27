@@ -286,7 +286,6 @@ namespace NettruyenRemake.Controllers
                     var httpClient = new HttpClient();
                     var html = await httpClient.GetStringAsync(url);
 
-
                     // Regex lấy các thể loại
                     var categoryRegex = new Regex(@"<span[^>]*class=""badge[^""]*""[^>]*>(.*?)<\/span>", RegexOptions.IgnoreCase);
                     var categoryMatches = categoryRegex.Matches(html);
@@ -328,18 +327,20 @@ namespace NettruyenRemake.Controllers
                     byte[]? imageBytes = null;
                     if (!string.IsNullOrEmpty(thumbnailUrl) && thumbnailUrl != "Không tìm thấy thumbnail")
                     {
+                        thumbnailUrl = "https://mangapark.io" + thumbnailUrl;
                         imageBytes = await ImageHelper.DownloadImageAsync(thumbnailUrl);
                     }
 
-                    return Json(new
+                    var result = Json(new
                     {
                         title = title,
                         description = description,
                         author = author,
                         thumbnailUrl = thumbnailUrl,
-                        thumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "" ,
+                        thumbnailPreview = imageBytes != null ? Convert.ToBase64String(imageBytes) : "",
                         categories = categories
                     });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -446,6 +447,7 @@ namespace NettruyenRemake.Controllers
                     byte[]? imageBytes = null;
                     if (!string.IsNullOrEmpty(thumbnailUrl) && thumbnailUrl != "Không tìm thấy thumbnail")
                     {
+                        thumbnailUrl = "https://mangapark.io" + thumbnailUrl;
                         imageBytes = await ImageHelper.DownloadImageAsync(thumbnailUrl);
                     }
 
